@@ -1,0 +1,50 @@
+\begin{tikzpicture}
+  \begin{axis}[
+      cycle list name=mystyle,
+      title={(a) System Service Level (SDR = 0.8)},
+      xlabel=Facility Accessibility Parameter ($\phi_L$),
+      ylabel=System Service Level,
+      legend to name={the legend reference},
+      legend cell align={left},
+      legend style={row sep=3mm},
+      legend columns=4,
+      xmin=0,xmax=1,ymin=0.5,ymax=1]
+      
+    % Current
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/AmiIpPropPolicyFactoryDelay0.csv};
+    \addlegendentry{$\frac{4 \times AMI - IP}{PROP}$}
+
+    % Last year
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/AmdLastYearIpPropPolicyFactoryDelay0.csv};
+    \addlegendentry{$\frac{4\times AMD[-12,-9] - IP}{PROP}$}
+    
+    % LSI
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/LsiAmdIPropPolicyFactoryDelay0.csv};
+    \addlegendentry{$\frac{4 \times LSI \times AMD - I}{PROP}$}
+
+    % Optimization    
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/OptimizationPolicyDelay0.csv};
+    \addlegendentry{$OPT^{16}_{0.99}$}
+
+  \end{axis}
+\end{tikzpicture}

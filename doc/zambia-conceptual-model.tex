@@ -1,0 +1,260 @@
+\chapter[Conceptual Model (Zambia)]{Conceptual Model of Zambia Supply Chain}
+
+In this chapter, we describe our conceptual model
+for the Zambia public-sector supply chain for medical drugs.
+This is a very brief description of the Zambia supply chain
+for the purposes of showing how to use the supply chain simulator.
+For a detailed description,
+we refer the reader to \citet{gallien-leung-yadav-2014}.
+We focus our attention on modeling the demand for a single drug,
+ACT (Artemisinin-based Combination Therapy),
+which is the standard and most effective first-line medicine for malaria.
+
+
+
+
+
+\section{Discrete Time Framework}
+\label{section:zambia->computer-model->time-unit}
+
+For the conceptual model of the Zambia supply chain,
+we chose to use a period as the basic time unit,
+with a period defined as 1/48-th of a year,
+or equivalently for one year to be composed of 48 periods.
+This is convenient for several reasons:
+\begin{enumerate}
+\item
+The demand for antimalarial drugs has an annual seasonality,
+because climatic factors (particularly rainfall)
+influence the incidence of malaira.
+By using the basic time unit of a period equal to 1/48-th of a year,
+the demand mean for period $0$ is equal to the demand mean in period $48$.
+If we had chosen the basic time unit of a period equal to a week,
+then a year is composed of $52\frac{1}{7}$ periods,
+so that the demand mean for period $0$
+is not equal to the demand mean in period $52$.
+\item
+The inventory replenishment process in Zambia
+occurs according to a monthly cycle.
+By using the basic time unit of a period equal to 1/48-th of a year,
+the schedule of events in the replenishment process
+occurs on regular period numbers,
+e.g.\ the shipment periods to a facility might be periods $0, 4, 8, 12$.
+If we had chosen the basic time unit of a period equal to a week,
+then the shipment period to a facility would be irregular,
+e.g.\ the shipment periods to a facility might be periods $0, 5, 9, 13, 18$.
+\item
+For the purpose of computing monthly statistics,
+e.g.\ average service level in January,
+it is easier to convert periods to calendar months
+when we use the basic time unit of a period equal to 1/48-th of a year.
+\end{enumerate}
+
+
+
+
+
+
+\section{Supply Chain Topology}
+
+The Zambia public-sector supply chain for medical drugs has three tiers.
+\begin{itemize}
+\item
+The first tier is the national warehouse in the captial city, Lusaka.
+Drugs entering the country first arrive at the national warehouse.
+The national warehouse is operated by a para-statal company
+known as Medical Stores Limited (MSL).
+\item
+The second tier facilities are the district warehouses.
+Politically, Zambia is divided into ten provinces,
+which are further subdivided into 89 districts.
+\item
+Finally, the third tier is composed of approximately 1500 health facilities.
+\end{itemize}
+
+
+
+
+\section{Exogenous Supply and Demand}
+
+We assume that MSL is given a predictable schedule
+of inventory deliveries at the national warehouse.
+
+We focus our attention on modeling the demand for a single drug,
+ACT (Artemisinin-Based Combination Therapy),
+which is the standard and most effective first-line medicine for malaria.
+It is recommended that a malaria patient
+should receive this treatment within 24 hours of starting a fever.
+If the patient does not receive ACT drugs promptly,
+then the patient could progress to severe malaria
+which requires more aggressive medical treatment.
+Based on these characteristics,
+we chose to model the Zambia supply chain as a lost sales system.
+
+We propose to use a multiplicative
+martingale model of forecast evolution
+\citep{heath-jackson-1994}
+to generate the demand.
+We chose this demand model
+because it is able to generate both demands
+and demand forecasts
+which are useful for the optimization-based replenishment policy
+but also more sophisticated forecast-based replenishment policies.
+
+
+
+
+
+\section{Inventory Replenishment Process}
+
+\subsection{Inventory Replenishment Constraints}
+
+The inventory replenishment process in Zambia
+occurs on a monthly cycle.
+In other words, at a particular date every month,
+a customer facility submits an order form to its supplier facility,
+and at another date every month,
+the supplier facility packs and sends a shipment to the customer facility.
+
+The existing order process in Zambia relies on paper order forms.
+We assume that there is a one week delay
+for a paper form to travel from a customer facility to a supplier facility.
+There has been a proposal to replace paper order forms by cell phones.
+We assume that using cell phones to keep inventory records
+would allow orders to be transmitted instantaneously.
+
+In the Zambia supply chain,
+the primary distribution of medical drugs
+(i.e.\ the national warehouse making shipments to district warehouses)
+occurs according to a monthly shipment schedule that is pre-determined by MSL.
+The inventory is transported by ten-tonne trucks
+which travel on main arterial highways of Zambia.
+Consequently, primary distribution is both regular and predictable.
+
+In contrast,
+the secondary distribution of medical drugs
+(i.e.\ district warehouses making shipments to health facilities)
+is irregular due to resource constraints at the district level.
+The roads to the more rural health facilities
+are primitive gravel or dirt road surfaces.
+The two most important transporation constraints are:
+\begin{enumerate}
+\item
+There is a lack of a dedicated vehicle for drug delivery at the district.
+Any district vehicles are shared between multiple health programs.
+Thus in practice, drug delivery to a given health facility
+can only occur if a district vehicle happens to visit that health facility.
+\item
+For certain health facilities at certain times of the year,
+the health facility may be rendered temporarily inaccessibile
+due to the roads leading to the facility being temporarily flooded.
+\end{enumerate}
+Based on these two secondary shipment constraints,
+we propose a lead time model based on two Bernoulli random variables,
+one for a vehicle from the district being available
+to make a visit to a health facility in a given period,
+and another for the road to the health facility being accessibile.
+A shipment only takes place if
+both of these Bernoulli random variables are successes.
+
+As in the \scs\ supply chain,
+the Zambia supply chain can operate in
+either an intermediate stocking configuration
+or a cross-docking configuration.
+
+\paragraph{Timing of replenishment processes}
+For primary distribution,
+each district warehouse is required to submit its order form
+to the national warehouse by a scheduled cutoff date.
+In an intermediate stocking configuration,
+the district warehouse must submit its order form by the order cutoff;
+whereas the health facilities are scheduled to submit their order forms
+on the first day of each month.
+In a cross-docking configuration,
+each health facility is schedule to submit its order form
+to the national facility
+by the scheduled cutoff date for orders from
+the district warehouse corresponding to the health facility.
+
+
+
+
+
+
+\subsection{Existing Inventory Replenishment Policies}
+
+During the Zambia supply chain pilot in 2009/2010,
+two inventory replenishment policies were tested.
+Both policies were versions of \emph{order-up-to policies},
+in other words the replenishment quantity is
+the amount of inventory needed
+to bring the inventory position
+up to an order-up-to level:
+\[
+    \text{replenishment quantity}
+  =
+    \text{order-up-to level}
+    - \text{inventory position}.
+\]
+In the Zambia replenishment policies,
+the order-up-to level for a given facility
+is a multiple $M$ of the average monthly issues (AMI),
+which is the average monthly quantity of the drug
+issued over the last three months at the facility;
+and the inventory position is defined as the
+sum of the current inventory level
+and the shipment quantities that are currently in transit to the facility.
+
+The two replenishment policies that were tested in Zambia are:
+\begin{enumerate}
+\item
+A intermediate stocking policy
+with an order-up-to level of three months AMI at the district facilities
+and an order-up-to level of two months AMI at the health facilities.
+\item
+A cross-docking policy
+with an order-up-to level of four months AMI at the health facilities.
+\end{enumerate}
+
+
+
+
+
+
+\subsection{Optimization-Based Replenishment Policy}
+\label{subsection:zambia->conceptual-model->optimization-policy}
+
+As researchers in the field of supply chain management,
+we proposed a cross-docking optimization-based inventory replenishment policy,
+which takes into account the following factors:
+\begin{itemize}
+\item the schedule of deliveries at the national warehouse
+\item the primary distribution shipment schedule
+\item the probability distribution of shipment lead times
+\item the forecast for future demand
+\item the inventory level at the health facilities
+\item the shipments in transit to the health facilities
+\end{itemize}
+
+For a mathematical definition of the optimization-based
+inventory replenishment policy,
+see \citet{gallien-leung-yadav-2014}.
+
+
+
+
+
+\subsection{Clairvoyant Replenishment Policy}
+
+In order to benchmark the performance of inventory replenishment policies,
+we propose a clairvoyant replenishment policy,
+which is able to foresee future demands and lead times with 100\% accuracy.
+Clearly, this policy cannot be used in practice.
+Nevertheless it is useful as an upper bound to the performance
+of any replenishment policy.
+The clairvoyant replenishment policy is an optimization-based policy
+in a similar spirit to the optimization-based policy
+described in \autoref{subsection:zambia->conceptual-model->optimization-policy},
+except that we replace the lead time percentiles by the realized lead time,
+and the demand tangents by the realized demands.
+

@@ -1,0 +1,240 @@
+\documentclass{beamer}
+
+\usepackage{booktabs}
+
+\usetheme{Warsaw}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{High-Level Structure of Supply Chain Simulator Manual}
+\author{Ngai-Hang Zachary Leung}
+
+\begin{document}
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Conceptual Model}
+
+\begin{frame}{Goal of this Section}
+\begin{itemize}
+\item
+High-level description of the implementation of the logical structure in code
+\item
+How to implement your own demand model, lead time model or replenishment policy
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Overview}
+\begin{itemize}
+\item SCS simulates a country's supply chain for a single product
+\item SCS is a discrete-event simulation
+\item Refer to sections below for supply chain topology,
+exogenous supply and demand,
+inventory replenishment process
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Supply Chain Topology}
+\begin{itemize}
+\item The supply chain topology can be represented by a graph
+\item The nodes correspond to the facilities
+\item The directed edges correspond to a (supplier, customer) relationship
+\item The SCS supply chain has three tiers
+\item Each retail facility is located in a geographical region
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exogenous Supply and Demand}
+\begin{itemize}
+\item The national supply schedule specifies
+the timing and quantity of inventory arriving at the national facility
+\item At each retail facility,
+inventory is deplemented by demand induced by customers
+\item The demand is random and generated from a demand model
+\item The demand model is also able to generate demand forecasts
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\subsection{Inventory Replenishment Process}
+
+\begin{frame}{Overview}
+\begin{itemize}
+\item We define the inventory replenishment process
+  and the sequence of events
+  in the context of a generic (supplier, customer) relationship
+\item We define primary and secondary distribution,
+  and the associated shipment schedule, shipment lead times,
+  and report lead times
+\item We define the inventory replenishment process
+  in an intermediate stocking configuration
+\item We define the inventory replenishment process
+  in a cross-docking configuration
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Generic (Supplier, Customer) Relationship}
+\begin{itemize}
+\item We define the inventory replenishment process
+  in the context of a generic (supplier, customer) relationship
+\item We first define the following entities:
+  report, replenishment policy and shipment
+\item The inventory replenishment process is:
+    \begin{itemize}
+    \item
+    The customer facility sends a report
+    \item
+    The supplier facility receives the report,
+    calculates a shipment quantity
+    according to the inventory replenishment policy,
+    and makes a shipment to the customer facility
+    \item
+    The customer facility receives the shipment
+    \end{itemize}
+\item The schedule of events can be defined by
+the shipment schedule indicates which periods
+the supplier facility is eligible to make a shipment to the customer facility
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Generic (Supplier, Customer) Relationship}
+\begin{itemize}
+\item Next we define the schedule of events in the
+  inventory replenishment process
+\item We first define the following concepts:
+  shipment schedule, shipment lead time, report lead time
+\item The schedule of events:
+    \begin{description}
+    \item[Period $t - r$:]
+    The customer facility sends a report
+    \item[Period $t$:]
+    The supplier facility receives the report
+    and makes a shipment to the customer facility
+    \item[Period $t + \ell_t$:]
+    The customer facility receives the shipment
+    \end{description}
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{Intermediate Stocking Configuration}
+\begin{itemize}
+\item Regional facilities hold a central pool of inventory and make shipments
+\item The national facility supplies the regional facilities.
+The report lead time is the primary report lead time,
+the shipment lead time is the primary shipment lead time.
+\item A retail facility is supplied by its regional facility.
+The report lead time is the secondary report lead time,
+the shipment lead time is the secondary shipment lead time.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cross-docking Configuration}
+\begin{itemize}
+\item Regional facilities do not hold a central pool of inventory,
+instead reports and shipments pass through
+\item The national facility supplies the retail facilities.
+The report lead time is
+the sum of the primary and secondary report lead times,
+the shipment lead time is
+the sum of the primary and secondary shipment lead time.
+\item The shipment schedule is the primary shipment schedule.
+We assume that the regional facility will forward a shipment
+to the retail facility once the regional facility receives it
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{Comparing Inventory Replenishment Policies}
+\begin{itemize}
+\item What is assumed to be fixed (exogenous):
+  \begin{itemize}
+  \item National supply schedule
+  \item Demand model
+  \item Primary and secondary shipment schedule
+  \item Primary and secondary report lead times
+  \item Primary and secondary shipment lead time model
+  \end{itemize}
+\item What can be changed:
+  \begin{itemize}
+  \item The supply chain configuration
+    (either intermediate stocking or cross-docking)
+  \item The shipment quantities
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\section{Computer Model}
+
+\begin{frame}{Goal of this Section}
+\begin{itemize}
+  \item Explain the high-level design of the code
+  \item Show the correspondence between logical entities
+    and Java classes in the code
+  \item Explain how a user can write his/her own
+    replenishment policy, lead time model, or demand model
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Entities}
+\begin{itemize}
+\item
+Each entity described in the logical structure of the supply chain
+is represented by a Java class.
+\item
+The table below shows the correspondence
+between logical entities and Java classes:
+{ \footnotesize \begin{tabular}{ll}
+\toprule
+  Entity & Class \\
+\midrule
+  Supply chain topology
+    & \code{Topology} \\
+  Replenishment policy for national facility
+    & \code{NationalReplenishmentPolicy} \\
+  \ldots & \ldots \\
+\bottomrule
+\end{tabular}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Packages}
+\begin{itemize}
+\item
+The code is organized into packages
+\item
+Here are the packages
+\item
+These are the contents of package A
+\item
+These are the contents of package B
+\end{itemize}
+\end{frame}
+
+\end{document}
+
+
+\begin{frame}{}
+\begin{itemize}
+\item
+\end{itemize}
+\end{frame}

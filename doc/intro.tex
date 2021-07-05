@@ -1,0 +1,68 @@
+\chapter{Introduction}
+
+Supply Chain Simulator (\scs)
+is a discrete-event simulation of a three-tier supply chain
+with stochastic demand, stochastic lead times, and lost sales.
+\scs\ is written in the Java\texttrademark\ programming language.
+
+The supply chain is defined by the topology of the supply chain system,
+the demand model, the lead time model,
+the shipment schedule
+and the inventory replenishment policy.
+Next, the user can specify the simulation parameters
+such as the initial inventory level
+and the number of periods to simulate.
+After running the simulation,
+\scs\ is able to write as output
+statistics of interest
+(e.g.\ the service level, average inventory level at the facility)
+as well as the raw simulation output.
+As \scs\ is designed with a modular software architecture,
+the user is able to easily plug-and-play different components
+(supply chain topology, demand, lead time, shipment schedule
+and inventory replenishment policy).
+It is also easy for a user to write a new customized component.
+Finally, we explain how to use SCS
+to simulate drug distribution in Zambia
+and the associated data files which were estimated
+using data collected from Zambia.
+
+The raison d'\^{etre} of \scs\
+is to evaluate inventory replenishment policies via simulation.
+\scs\ automatically computes certain supply chain metrics
+such as the service level (proportion of demand satisfied)
+and the average inventory level at a facility.
+
+\scs\ was written because we (the authors) wished to analyze
+the public-sector supply chain for medical drugs in Zambia.
+The reader may wish to refer to our paper
+\todo{Insert link to our MSOM paper.}
+for an illustration of how \scs\
+can be used in real-life to answer interesting research questions
+related to inventory management.
+
+
+
+
+
+\section{How to Navigate This Manual}
+
+The logical structure of the supply chain simulated by \scs\
+is described in \autoref{chapter:conceptual-model}.
+The implementation of the logical structure in Java code
+in described in \autoref{chapter:implementation}.
+The simulation of a basic intermediate stocking supply chain
+and the simulation of a basic cross-docking supply chain
+are described in \autoref{chapter:tutorials}.
+
+In \autoref{chapter:zambia},
+we describe a real-world use case of \scs\
+to evaluate the performance
+of the public-sector supply chain for medical drugs in Zambia.
+We present both the logical structure of the Zambia supply chain,
+and the accompanying input data files.
+
+Finally, installation instructions are found in
+\autoref{chapter:installation}.
+
+

@@ -1,0 +1,107 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+\usepackage[paperheight=45cm,paperwidth=26cm,margin=1cm]{geometry}
+
+\pgfplotsset{compat=1.12}
+
+\newcolumntype{M}{>{\centering\arraybackslash}m{\dimexpr.48\linewidth-2\tabcolsep}}
+
+\pagenumbering{gobble} % Remove page numbers (and reset to 1)
+
+%\pgfplotscreateplotcyclelist{mystyle}{
+%teal,every mark/.append style={fill=teal!80!black},mark=*\\%
+%orange,every mark/.append style={fill=orange!80!black},mark=square*\\%
+%cyan!60!black,every mark/.append style={fill=cyan!80!black},mark=otimes*\\%
+%lime!80!black,mark=star\\%
+%lime!80!black,every mark/.append style={fill=lime},mark=diamond*\\%
+%}
+
+\pgfplotscreateplotcyclelist{mystyle}{
+black,every mark/.append style={fill=white},mark=otimes*\\%
+%black,dashed,every mark/.append style={fill=white},mark=otimes*\\%
+green!80!black,every mark/.append style={fill=white},mark=square*\\%
+%green!80!black,dashed,every mark/.append style={fill=white},mark=square*\\%
+blue,every mark/.append style={fill=blue},mark=*\\%
+%blue,dashed,every mark/.append style={fill=blue},mark=*\\%
+red,mark=star\\%
+%red,every mark/.append style={fill=lime},mark=diamond*\\%
+}
+
+\title{exp12.tex}
+\author{Zachary Leung}
+\date{2021-03-21}
+
+\begin{document}
+
+\maketitle
+
+\begin{equation*}
+\textbf{Notation for $\phi_L$:}
+\quad
+a_{t}^{h}[\phi_{L}] \triangleq \phi_{L}*a_{t}^{h} + (1-\phi_{L})
+\end{equation*}
+
+\begin{center}
+\begin{itemize}
+\item If $\phi_L$ = 0, then every facility is fully accessible, i.e.,
+      $a_t^h[\phi_{L}] = 1$
+\item If $\phi_L$ = 1, then every facility has accessibility probability
+      equal to the value in the original dataset, i.e.,
+      $a_t^h[\phi_{L}] = a_t^h$
+\end{itemize}
+\end{center}
+
+\subsubsection*{Supply / Demand ratio = 0.8}
+\begin{verbatim}
+inputFolder = "input/zambia";
+\end{verbatim}
+\verbatiminput{0.8/0010/out.txt}
+
+
+
+\subsubsection*{Supply / Demand ratio = 1.1}
+\begin{verbatim}
+inputFolder = "input/zambia";
+\end{verbatim}
+\verbatiminput{1.1/0025/out.txt}
+
+\begin{verbatim}
+Note: the relative margin of error (RMOE) is defined as the half-width
+of the 95% confidence interval, divided by the mean estimate.
+\end{verbatim}
+
+
+
+
+
+
+
+
+\clearpage
+\pgfplotsset{width=10cm,height=10cm}
+\begin{center}
+\begin{tabular}{MM}
+\input{figure-1}%
+&
+\input{figure-2}%
+\\[5mm]
+\input{figure-3}%
+&
+\input{figure-4}%
+\\[5mm]
+\input{figure-5}%
+&
+\input{figure-6}%
+%\\[5mm]
+%\multicolumn{3}{c}{\ref{the legend reference}}
+\end{tabular}
+~\\[5mm]
+\ref{the legend reference}
+\end{center}
+
+\end{document}

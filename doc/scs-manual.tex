@@ -1,0 +1,279 @@
+\documentclass[12pt,oneside]{memoir}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{bm}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage[htt]{hyphenat}
+\usepackage{listings}
+\usepackage{mathrsfs}
+\usepackage{natbib}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{todonotes}
+
+% change the default typewriter font to inconsolata
+%\usepackage{inconsolata}
+
+% Using Courier font
+\renewcommand{\ttdefault}{pcr}
+
+% tiny
+% scriptsize
+% footnotesize
+% small
+% normalsize
+% large
+% Large
+% LARGE
+% huge
+% Huge
+
+
+
+
+% draw UML diagrams
+\usepackage[simplified]{pgf-umlcd}
+% new environment for UML diagrams
+\newenvironment{myuml}%
+{\begin{tikzpicture}[font=\ttfamily\scriptsize]}%
+{\end{tikzpicture}}
+
+% Number parts, chapters, sections, subsections and subsubsections
+\setcounter{secnumdepth}{3}
+% Put parts, chapters, sections, subsections and subsubsections in the
+% table of contents
+\setcounter{tocdepth}{1}
+
+% logical entity modeled in supply chain
+\newcommand{\entity}[1]{\textsc{#1}}
+
+% name of Java class
+%\usepackage{url}
+%\DeclareUrlCommand\code{\urlstyle{tt}}
+\newcommand{\code}[1]{{\scriptsize\texttt{#1}}}
+
+
+\newcommand{\mytodo}[1]{\todo[inline]{#1}}
+
+% a mod b
+\newcommand{\amodb}[2]{#1\,\bmod\,#2}
+
+
+\newtheorem{definition}{Definition}
+
+
+\listfiles
+
+
+
+
+%\usepackage{showkeys}
+% wrap labels from showkeys package
+%\renewcommand*\showkeyslabelformat[1]{%
+%\fbox{\parbox[t]{\marginparwidth}{\raggedright\normalfont\small\ttfamily#1}}}
+
+
+
+% all information up to the current period
+\newcommand{\info}{\mathscr{I}}
+
+% expected value
+\newcommand{\EX}[1]{\mathbb{E}\left[#1\right]}
+% conditional expected value
+\newcommand{\cEX}[2]{\mathbb{E}\left[#1\,\big|\,#2\right]}
+
+
+%%----------------------------------------------------------------------------%%
+%% How to format random variables                                             %%
+%%----------------------------------------------------------------------------%%
+
+\makeatletter
+\newcommand{\generate}[4]{%
+  %#1 = prefix, #2 = macro, #3 = starting point, #4 = end point
+  \def\@tempa{#1} % we don't want to lowercase it
+  \count@=`#3
+  \loop
+  \begingroup\lccode`?=\count@
+  \lowercase{\endgroup\@namedef{\@tempa ?}{#2{?}}}%
+  \ifnum\count@<`#4
+  \advance\count@\@ne
+  \repeat
+}
+
+\generate{rv}{\mathbf}{A}{Z}
+\generate{rv}{\mathbf}{a}{z}
+
+\newcommand{\rvnu}{\bm{\nu}}
+
+
+
+%%----------------------------------------------------------------------------%%
+%% How to format Java code                                                    %%
+%%----------------------------------------------------------------------------%%
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\scriptsize\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+
+
+%%----------------------------------------------------------------------------%%
+%% Algorithms                                                                 %%
+%%----------------------------------------------------------------------------%%
+
+\newcommand{\algocomment}[1]{\textcolor{green!70!black}{\% #1}}
+
+
+
+
+
+%%----------------------------------------------------------------------------%%
+%% References                                                                 %%
+%%----------------------------------------------------------------------------%%
+
+\newcommand{\algorithmautorefname}{Algorithm}
+\renewcommand{\chapterautorefname}{Chapter}
+\renewcommand{\sectionautorefname}{\S}
+\renewcommand{\subsectionautorefname}{\S}
+\renewcommand{\subsubsectionautorefname}{\S}
+
+\newcommand{\scs}{{\bfseries SuChSim}}
+
+
+%%----------------------------------------------------------------------------%%
+%% TikZ                                                                       %%
+%%----------------------------------------------------------------------------%%
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+
+
+\tikzset{
+  facility/.style={rectangle,draw=blue!50,fill=blue!20,
+                   minimum width=20mm,align=center,
+                   text width=20mm,font=\footnotesize},
+  medarrow/.style={>=stealth,line width=2pt,->},
+  reportflow/.style={>=stealth,line width=2pt,->,dashed},
+  invflow/.style={>=stealth,line width=2pt,->},
+  mail/.style={font=\footnotesize},
+  interval/.style={<->,line width=1pt,font=\footnotesize},
+  event/.style={rectangle,align=center,text width=26mm,font=\scriptsize},
+  point/.style={circle,minimum width=6mm,yshift=-1.5mm},
+  timelabel/.style={anchor=north,text height=0.8em,text depth=0.25ex},
+}
+
+
+
+
+
+
+
+
+\title{Manual for Supply Chain Simulator}
+\author{%
+J\'er\'emie Gallien%
+\and Ngai-Hang Zachary Leung%
+%\and Prashant Yadav
+}
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+Supply Chain Simulator (\scs)
+is a discrete-event simulation of a three-tier supply chain
+with stochastic demand, stochastic lead times, and lost sales.
+\scs\ is written in the Java\texttrademark\ programming language.
+The supply chain is defined by the topology of the supply chain system,
+the demand model, the lead time model,
+the shipment schedule
+and the inventory replenishment policy.
+Next, the user can specify the simulation parameters
+such as the initial inventory level
+and the number of periods to simulate.
+After running the simulation,
+\scs\ is able to write as output
+statistics of interest
+(e.g.\ the service level, average inventory level at the facility)
+as well as the raw simulation output.
+As \scs\ is designed with a modular software architecture,
+the user is able to easily plug-and-play different components
+(supply chain topology, demand, lead time, shipment schedule
+and inventory replenishment policy).
+It is also easy for a user to write a new customized component.
+Finally, we explain how to use \scs\
+to simulate drug distribution in Zambia
+and the associated data files which were estimated
+using data collected from Zambia.
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+
+
+
+
+
+\include{intro}
+
+\part{Supply Chain Simulator}
+\include{scs-conceptual-model}
+\include{scs-computer-model}
+
+\part{Zambia Supply Chain}
+\include{zambia-conceptual-model}
+\include{zambia-computer-model}
+
+\part{Step-by-Step Tutorials}
+\include{install}
+
+\chapter{Tutorial: Basic Scenarios}
+
+\section{Intermediate Stocking Replenishment Policy}
+
+\section{Cross-Docking Replenishment Policy}
+
+\section{Optimization Replenishment Policy}
+
+\section{Clairvoyant Replenishment Policy}
+
+
+
+\chapter{Tutorial: Zambia Scenarios}
+
+
+
+
+
+\bibliographystyle{plainnat}
+\bibliography{bib}
+
+\end{document}
+

@@ -1,0 +1,263 @@
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = AmiOrderUpToLevel{
+        history periods = 12
+        order up to periods = 16.0
+      }
+    }
+    report delay = 1
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 20.0
+      forecast level = 1
+      shipment lead time percentile = 0.99
+    }
+    report delay = 0
+  }
+}
+
+Total time elapsed = 5.289 s
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = AmiOrderUpToLevel{
+        history periods = 12
+        order up to periods = 16.0
+      }
+    }
+    report delay = 1
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 20.0
+      forecast level = 1
+      shipment lead time percentile = 0.99
+    }
+    report delay = 0
+  }
+}
+
+Total time elapsed = 9.343 s
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = ForecastOrderUpToLevel{
+        forecast periods = 20.0
+        forecast accuracy level = 1
+      }
+    }
+    report delay = 0
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 20.0
+      forecast level = 1
+      shipment lead time percentile = 0.99
+    }
+    report delay = 0
+  }
+}
+
+Total time elapsed = 8.167 s
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = ForecastOrderUpToLevel{
+        forecast periods = 20.0
+        forecast accuracy level = 1
+      }
+    }
+    report delay = 0
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 20.0
+      forecast level = 1
+      shipment lead time percentile = 0.99
+    }
+    report delay = 0
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = ForecastOrderUpToLevel{
+        forecast periods = 24.0
+        forecast accuracy level = 1
+      }
+    }
+    report delay = 0
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 24.0
+      forecast level = 1
+      shipment lead time percentile = 0.998
+    }
+    report delay = 0
+  }
+}
+
+Total time elapsed = 28.18 s
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = ForecastOrderUpToLevel{
+        forecast periods = 24.0
+        forecast accuracy level = 1
+      }
+    }
+    report delay = 0
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 24.0
+      forecast level = 1
+      shipment lead time percentile = 0.998
+    }
+    report delay = 0
+  }
+}
+
+Total time elapsed = 35.43 s
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = ForecastOrderUpToLevel{
+        forecast periods = 24.0
+        forecast accuracy level = 1
+      }
+    }
+    report delay = 0
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 24.0
+      forecast level = 1
+      shipment lead time percentile = 0.998
+    }
+    report delay = 0
+  }
+}
+
+Total time elapsed = 1.958 min
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OrderUpToReplenishmentPolicy{
+      order up to level = ForecastOrderUpToLevel{
+        forecast periods = 24.0
+        forecast accuracy level = 1
+      }
+    }
+    report delay = 0
+  }
+}
+
+XdockScenario{
+  retail initial inventory level = AmiOrderUpToLevel{
+    history periods = 12
+    order up to periods = 8.0
+  }
+  replenishment policy = XdockReplenishmentPolicy{
+    replenishment function = OptimizationReplenishmentFunction{
+      forecast horizon = 48
+      unmet demand cost = 24.0
+      forecast level = 1
+      shipment lead time percentile = 0.998
+    }
+    report delay = 0
+  }
+}
+
+Total time elapsed = 16.44 min

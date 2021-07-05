@@ -1,0 +1,50 @@
+*.sh
+*.log
+*.txt
+*.csv
+
+# Eclipse files
+/bin
+
+# Gurobi files
+*.lp
+*.ilp
+gurobi-threads.txt
+
+# kpsewhich files
+ls-R
+
+# Java files
+*.class
+
+# LaTeX files
+*.pdf
+*.loe
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.aux
+*.synctex.gz
+*.synctex.gz(busy)
+# LaTeX beamer files
+*.nav
+*.snm
+# LaTeX bibtex files
+*.bbl
+*.blg
+# LaTeX package listings files
+*.listing
+*.tmp
+
+# OS X files
+.DS_Store
+
+# R files
+*.Rdata
+*.Rhistory
+
+# VIM files
+*.swp
+*~

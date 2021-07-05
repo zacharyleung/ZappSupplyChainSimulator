@@ -1,0 +1,139 @@
+\begin{center}
+\begin{tabular}{MM}
+    \begin{tikzpicture}
+      \begin{axis}[
+          cycle list name=mystyle,
+          title={(a) System Service Level},
+          xlabel=Supply/Demand Ratio,
+          ylabel=System Service Level,
+          legend pos=south east,
+          legend to name={the legend reference},
+          legend cell align={left},
+          legend style={row sep=3mm},
+          xmin=0.58,xmax=1.22,ymin=0.5,ymax=1]
+          
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=serv_mean,
+                  y error=serv_meane]
+            {0025/LsiAmdIpPropPolicyFactoryDelay0.csv};
+        \addlegendentry{$\frac{4 \times LSI \times AMD - IP}{PROP}
+        \{\text{delay} = 0\}$}
+        
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=serv_mean,
+                  y error=serv_meane]
+            {0025/LsiAmdIPropPolicyFactoryDelay0.csv};
+        \addlegendentry{$\frac{4 \times LSI \times AMD - I}{PROP}
+        \{\text{delay} = 0\}$}
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=serv_mean,
+                  y error=serv_meane]
+            {0025/LsiAmiIpPropPolicyFactoryDelay0.csv};
+        \addlegendentry{$\frac{4 \times LSI \times AMI - IP}{PROP}
+        \{\text{delay} = 0\}$}
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=serv_mean,
+                  y error=serv_meane]
+            {0025/LsiAmiIPropPolicyFactoryDelay0.csv};
+        \addlegendentry{$\frac{4 \times LSI \times AMI - I}{PROP}
+        \{\text{delay} = 0\}$}
+
+% draw the line y = x
+%        \addplot+[white!60!black,mark=none,domain=0:1] {x};
+
+      \end{axis}
+    \end{tikzpicture}
+  &
+    \begin{tikzpicture}
+      \begin{axis}[
+          cycle list name=mystyle,
+          title={(b) Average Facility Inventory},
+          xlabel=Supply/Demand Ratio,
+          ylabel={Average Facility Inventory (No.~of Weeks)},
+          xmin=0.58,xmax=1.22,ymin=0]
+          
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=inv_mean,
+                  y error=inv_meane]
+            {0025/LsiAmdIpPropPolicyFactoryDelay0.csv};
+            
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=inv_mean,
+                  y error=inv_meane]
+            {0025/LsiAmdIPropPolicyFactoryDelay0.csv};
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=inv_mean,
+                  y error=inv_meane]
+            {0025/LsiAmiIpPropPolicyFactoryDelay0.csv};
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=inv_mean,
+                  y error=inv_meane]
+            {0025/LsiAmiIPropPolicyFactoryDelay0.csv};
+        
+        \end{axis}
+    \end{tikzpicture}
+  \\
+      \begin{tikzpicture}
+      \begin{axis}[
+          cycle list name=mystyle,
+          title={(c) Facility Service Level Equity},
+          xlabel=Supply/Demand Ratio,
+          ylabel={Std.~Dev.~of Facility Service Level},
+          ytick      ={0,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40},
+          yticklabels={0,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40},
+          xmin=0.58,xmax=1.22,ymin=0]
+          
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=stddev_serv_mean,
+                  y error=stddev_serv_meane]
+            {0025/LsiAmdIpPropPolicyFactoryDelay0.csv};
+            
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=stddev_serv_mean,
+                  y error=stddev_serv_meane]
+            {0025/LsiAmdIPropPolicyFactoryDelay0.csv};
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=stddev_serv_mean,
+                  y error=stddev_serv_meane]
+            {0025/LsiAmiIpPropPolicyFactoryDelay0.csv};
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=stddev_serv_mean,
+                  y error=stddev_serv_meane]
+            {0025/LsiAmiIPropPolicyFactoryDelay0.csv};
+
+      \end{axis}
+    \end{tikzpicture}
+  &
+    \ref{the legend reference}
+\end{tabular}
+\end{center}

@@ -1,0 +1,821 @@
+\chapter[Conceptual Model (\scs)]{Conceptual Model of \scs\ Supply Chain}
+\label{chapter:conceptual-model}
+
+
+\section{Overview}
+\label{section:conceptual-model->overview}
+
+In this chapter,
+we define the structure of the supply chain
+that is implemented in computer code by \scs.
+
+The \scs\ supply chain is a conceptual model of
+a country's supply chain for a single product.
+In \autoref{section:conceptual-model->discrete-time-framework}
+we define the discrete time framework that is used by \scs\
+to model the evolution of the state of the supply chain.
+We define the supply chain topology
+in \autoref{section:conceptual-model->supply-chain-topology},
+the exogenous supply and demand for inventory
+in \autoref{section:conceptual-model->supply-and-demand},
+the inventory replenishment process
+in \autoref{section:conceptual-model->inventory-replenishment},
+and the sequence of events in each period in
+\autoref{section:conceptual-model->sequence-of-events}.
+
+\paragraph{Notation}
+In this chapter,
+we use small capitals, e.g.\ \entity{national facility},
+to denote a conceptual entity that is represented in the supply chain.
+
+
+
+
+
+\section{Discrete Time Framework}
+\label{section:conceptual-model->discrete-time-framework}
+
+% Based on
+% http://en.wikipedia.org/wiki/Discrete_event_simulation
+\scs\ is a \emph{discrete-event simulation} of a supply chain.
+Wikipedia defines a discrete-event simulation as follows:
+\begin{quotation}
+A discrete-event simulation models the operation of a system
+as a discrete sequence of events in time.
+Each event occurs at a particular instant in time
+and marks a change of state in the system.
+Between consecutive events, no change in the system is assumed to occur.
+\end{quotation}
+
+% Based on
+% http://en.wikipedia.org/wiki/Discrete_time_and_continuous_time
+\scs\ is also a \emph{discrete time} simulation of a supply chain.
+That is, conceptually we divide time into \emph{periods},
+with a \emph{period} defined as the smallest unit of time
+that is represented in the simulation.
+For example, if we decide to model a year using 48 periods,
+then one period corresponds to a time interval of 1/48-th of a year;
+whereas if we choose to model a year using 365 periods,
+then one period corresponds to a time interval of one day.
+It is assumed that changes in the state of the supply chain
+occur at points in time that correspond to the beginning/end of a period.
+
+
+
+
+
+\section{Supply Chain Topology}
+\label{section:conceptual-model->supply-chain-topology}
+
+The supply chain topology can be represented by a graph,
+in which each facility corresponds to a node in the graph,
+and each (supplier, customer) relationship corresponds to
+a directed edge in the graph.
+
+The \scs\ supply chain is a three-tier supply chain,
+consisting of exactly one \entity{national facility},
+one or more \entity{regional facilities},
+and one or more \entity{retail facilities}.
+It is assumed that each \entity{retail facility}
+is located in a unique geographical region,
+which is served by a corresponding \entity{regional facility}.
+
+It is assumed that direct inventory shipments only occur
+from facilities in one tier of the supply chain
+to facilities in the tier directly below.
+In other words,
+the \entity{national facility}
+is the supplier of each \entity{regional facility};
+and each \entity{retail facility}
+is supplied by its \entity{regional facility}.
+
+The structure of the supply chain topology is illustrated in 
+\autoref{figure:conceptual-model->supply-chain-topology}.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+    [exoge/.style={rectangle,minimum width=20mm,align=center,
+                   text width=20mm,font=\footnotesize},
+     node distance=10mm]
+  % facilities
+  \node[exoge] (sup)                               {Exogeneous Supply};
+  \node[facility] (nat)  [below=of sup]               {National Facility};
+  \node[facility] (reg1) [below=of nat,xshift=-30mm]  {Regional Facility};
+  \node[facility] (reg2) [below=of nat,xshift=30mm]   {Regional Facility};
+  \node[facility] (ret1) [below=of reg1,xshift=-15mm] {Retail Facility};
+  \node[facility] (ret2) [below=of reg1,xshift=15mm]  {Retail Facility};
+  \node[facility] (ret3) [below=of reg2,xshift=-15mm] {Retail Facility};
+  \node[facility] (ret4) [below=of reg2,xshift=15mm]  {Retail Facility};
+  \node[exoge] (dem1) [below=of ret1]              {Exogeneous Demand};
+  \node[exoge] (dem2) [below=of ret2]              {Exogeneous Demand};
+  \node[exoge] (dem3) [below=of ret3]              {Exogeneous Demand};
+  \node[exoge] (dem4) [below=of ret4]              {Exogeneous Demand};
+
+  % inventory flows
+  \draw[medarrow] (sup) -- (nat);
+  \draw[medarrow] (nat) -- (reg1);
+  \draw[medarrow] (nat) -- (reg2);
+  \draw[medarrow] (reg1) -- (ret1);
+  \draw[medarrow] (reg1) -- (ret2);
+  \draw[medarrow] (reg2) -- (ret3);
+  \draw[medarrow] (reg2) -- (ret4);
+  \draw[medarrow] (ret1) -- (dem1);
+  \draw[medarrow] (ret2) -- (dem2);
+  \draw[medarrow] (ret3) -- (dem3);
+  \draw[medarrow] (ret4) -- (dem4);
+\end{tikzpicture}
+\caption{Example to illustrate the supply chain topology of \scs.
+Arrows denote the direction of inventory flows.}
+\label{figure:conceptual-model->supply-chain-topology}
+\end{figure}
+
+
+
+
+\section{Exogenous Supply and Demand}
+\label{section:conceptual-model->supply-and-demand}
+
+The exogenous supply arrives at the \entity{national facility},
+while the exogenous demand arrives at each \entity{retail facility}.
+This is illustrated in
+\autoref{figure:conceptual-model->supply-chain-topology}.
+
+The \entity{national supply schedule}
+specifies both the timing and the quantity
+of inventory arriving at the \entity{national facility}.
+It is assumed that the supply of inventory
+received by the \entity{national facility} is exogenous.
+
+At each \entity{retail facility},
+inventory is depleted by the demand
+induced by customers who arrive at the facility.
+In general, the demand is random,
+and generated from a probability distribution
+which is specified by the \entity{demand model}.
+The demand is assumed to be exogenous,
+i.e.\ it is statistically independent
+of the state of the supply chain
+and of the inventory replenishment policy used.
+
+In the supply chain management literature,
+there are two different types of assumptions made about unmet demand:
+either unmet demand is backordered
+(i.e.\ customers remain waiting for the product
+and the demand is satisfied when inventory arrives in a future period),
+or unment demand is lost forever.
+\scs\ assumes that unmet demand is lost forever.
+
+To define the \entity{demand model} more precisely,
+let us denote by $\rvd_{rt}$
+the random quantity demanded at retail facility $r$ during period $t$.
+The \entity{demand model} specifies the joint probability distribution
+of the demand for each retail facility and each period,
+i.e.\ the set of random variables $\{\rvd_{rt}\}_{r,t}$
+over all retail facilities $r$ and all periods $t$.
+
+The \entity{demand model} is also able to provide
+a demand forecast of future demand $\rvd_{ru}$
+given all information revealed by the current time period $t$,
+which we denote by $\info_t$.
+Certain \entity{inventory replenishment policies}
+may use compute a replenishment quantity
+that depends on the demand forecasts $\rvd_{ru}$.
+For example,
+an order-up-to policy
+that orders up to the mean demand in the next 12 periods
+would ship a replenishment quantity given by
+\begin{align*}
+    q
+  &=
+    \text{expected demand in } [t, t+12) - \text{inventory position}_t
+\\
+  &=
+    \sum_{u=t}^{t+11} \cEX{\rvd_{ru}}{\info_t} - ip_t.
+\end{align*}
+
+
+
+
+
+
+\section{Inventory Replenishment Process}
+\label{section:conceptual-model->inventory-replenishment} 
+
+We define the basic inventory replenishment process
+in \autoref{conceptual-model->inventory-replenishment:generic-(supplier-customer)}.
+We introduce inventory replenishment constraints
+in \autoref{section:conceptual-model->inventory-replenishment-constraints}.
+The \scs\ supply chain can be operated
+in either an intermediate stocking configuration
+or a cross-docking configuration.
+We define the inventory replenishment process
+for an intermediate stocking configuration
+in \autoref{subsection:conceptual-model->inventory-replenishment->istock},
+while we define the process
+for a cross-docking configuration
+in \autoref{subsection:conceptual-model->inventory-replenishment->xdock}.
+
+
+
+
+
+
+\subsection{Basic Inventory Replenishment Process}
+\label{conceptual-model->inventory-replenishment:generic-(supplier-customer)}
+
+In this section,
+we define the basic inventory replenishment process,
+i.e.\ the process by which a customer facility
+receives inventory replenishment from a dedicated supplier facility.
+We refer to this arrangement as a (supplier, customer) relationship.
+
+In order to define the inventory replenishment process,
+we first need to define the following entities:
+\begin{description}
+  \item[Report]
+      The \entity{report} submitted by the customer facility
+      is a record of information that is relevant
+      in calculating a replenishment shipment quantity, including:
+      \begin{itemize}
+        \item The customer facility's current inventory level
+        \item Shipments in the inventory pipeline to the customer facility
+        \item Past demand and consumption at the customer facility
+      \end{itemize}
+  \item[Replenishment policy]
+      When a supplier facility has received a \entity{report}
+      from a customer facility,
+      the supplier facility uses the \entity{replenishment policy}
+      to calculate the shipment quantity
+      based on a subset of the following inputs:
+      \begin{itemize}
+        \item the received \entity{report}
+        \item the forecast for future \entity{demand} at the customer
+        \item the \entity{lead time} forecast for past, current and future
+            shipments to the customer
+      \end{itemize}
+      A \entity{replenishment policy} need not take into account
+      all of the above factors to compute a shipment quantity.
+      For example, an order-up-to policy
+      only depends on the customer facility \entity{report}.
+  \item[Shipment]
+      A shipment is some number of units of the product
+      that is packaged by the supplier facility into a common lot
+      and shipped to the customer facility.
+\end{description}
+
+The basic inventory replenishment process is the following:
+\begin{enumerate}
+  \item The customer facility sends a \entity{report}
+      to its supplier facility.
+  \item The supplier facility processes the \entity{report}
+      according to the \entity{inventory replenishment policy}
+      and computes a replenishment quantity,
+      and makes an \entity{shipment} to the customer facility.
+  \item The \entity{shipment} arrives at the customer facility.
+\end{enumerate}
+This is illustrated in
+\autoref{figure:inventory-replenishment-process}.
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=30mm]
+  \node[facility] (sup)                 {Supplier Facility};
+  \node[facility] (cust) [right=of sup] {Customer Facility};
+
+  \draw[medarrow,dashed]
+      (cust.north west) -- 
+      node[auto,mail,above] {Report}
+      (sup.north east);
+
+  \draw[medarrow]
+      (sup.south east) -- 
+      node[auto,mail,below] {Shipment}
+      (cust.south west);
+\end{tikzpicture}
+\\[5mm]
+\begin{tikzpicture}[
+    xscale=1.3,
+    node distance=15mm,
+    ]
+  % space between event labels and interval arrow
+  \def \myyshift{2mm}
+
+  \foreach \i in {-3,...,4} {
+    \draw (\i cm,3pt)
+        node (uptic\i) {}
+        -- (\i cm,-3pt)
+        node (downtic\i) {};
+  }
+  \draw[->,line width=1pt] (-3.2,0) -- (4.8,0);
+
+  \node[timelabel]
+       (reportSentTime) at (downtic-2) {$t - r$};
+  \node[event]    (reportSentLabel) [above=of uptic-2]
+      {Customer Facility sends report};
+  \draw[medarrow] (reportSentLabel) -- (uptic-2);
+
+  \node[timelabel]
+      (reportSentTime) at (downtic0) {$t$};
+  \node[event]     (reportReceivedLabel) [above=of uptic0]
+      {Supplier Facility receives report};
+  \draw[medarrow] (reportReceivedLabel) -- (uptic0);
+  \node[event] (shipmentSentLabel) [below=of reportSentTime]
+      {Supplier Facility sends shipment};
+  \draw[medarrow] (shipmentSentLabel) -- (reportSentTime);
+
+  \node[timelabel]
+      (shipmentSentTime) at (downtic4) {$t + \ell_t$};
+  \node[event] (shipmentReceivedLabel) [below=of shipmentSentTime]
+      {Customer Facility receives shipment};
+  \draw[medarrow] (shipmentReceivedLabel) -- (shipmentSentTime);
+
+  \draw[interval]
+      ([yshift=\myyshift]reportSentLabel.north) --
+      node[auto,above] {Report lead time}
+      ([yshift=\myyshift]reportReceivedLabel.north);
+
+  \draw[interval]
+      ([yshift=-\myyshift]shipmentSentLabel.south) --
+      node[auto,below] {Shipment lead time}
+      ([yshift=-\myyshift]shipmentReceivedLabel.south);
+\end{tikzpicture}
+\caption{Illustration of the inventory replenishment process.}
+\label{figure:inventory-replenishment-process}
+\end{figure}
+
+In order to define the schedule of events
+in the inventory replenishment process,
+we first need to define the following concepts:
+\begin{description}
+  \item[Shipment schedule] 
+      The \entity{shipment schedule} indicates which are the periods
+      in which the supplier facility can make a \entity{shipment}
+      to the customer facility.
+  \item[Shipment lead time]
+      The \entity{shipment} lead time is the number of periods of delay
+      between the supplier facility sending a \entity{shipment}
+      and the customer facility receiving the \entity{shipment}.
+      The \entity{shipment} lead time may be random
+      and depend on the period in which the \entity{shipment} is sent.
+      We denote the \entity{shipment} lead time at period $t$
+      by $\ell_t$ periods.
+  \item[Report lead time]
+      The \entity{report} lead time is the number of periods of delay
+      between the customer facility sending a \entity{report}
+      and the customer facility receiving the \entity{report}.
+      The \entity{report} lead time is assumed to be constant,
+      and we denote the \entity{report} lead time by $r$ periods.
+\end{description}
+
+Suppose that the \entity{shipment schedule}
+indicates that the supplier facility
+is eligible to make a \entity{shipment}
+to the customer facility at the beginning of period $t$.
+The schedule of events in the inventory replenishment process
+is defined as follows:
+\begin{description}
+  \item[Period $t - r$:]
+      The customer facility submits a \entity{report}
+      to the supplier facility.
+  \item[Period $t$:]
+      The supplier facility receives the \entity{report}
+      from the customer facility,
+      and makes a \entity{shipment} to the customer facility.
+  \item[Period $t + \ell_t$:]
+      The customer facility receives the \entity{shipment}
+      from the supplier facility.
+\end{description}
+This is illustrated in 
+\autoref{figure:inventory-replenishment-process}.
+
+
+
+
+
+
+\subsection{Inventory Replenishment Constraints}
+\label{section:conceptual-model->inventory-replenishment-constraints}
+
+For the sake of clarity,
+we will refer to shipments
+from the \entity{national facility} to \entity{regional facilities}
+as \emph{primary distribution};
+and refer to shipments
+from \entity{regional facilities} to \entity{retail facilities}
+as \emph{secondary distribution}.
+This is illustrated in
+\autoref{figure:conceptual-model->inventory-replenishment-constraints->primary-secondary-distribution}.
+
+\begin{figure}[h!]
+  \centering
+  \def \myyshift {0mm}
+  \tikzset{node distance=25mm}
+  \centering
+  \begin{tikzpicture}
+    % Facilities
+    \node[facility] (nat)                {National Facility};
+    \node[facility] (reg) [right=of nat] {Regional Facility};
+    \node[facility] (ret) [right=of reg] {Retail Facility};
+
+    % Inventory flows
+    \draw[invflow]
+        (nat) -- 
+        node[auto,above,text width=20mm,align=center,font=\footnotesize]
+            {Primary distribution}
+        (reg);
+    \draw[invflow]
+        (reg) -- 
+        node[auto,above,text width=20mm,align=center,font=\footnotesize]
+            {Secondary distribution}
+        (ret);
+  \end{tikzpicture}
+  \caption{Illustration of primary and secondary distribution.
+    Arrows denote the direction of inventory flows.
+  }
+  \label{figure:conceptual-model->inventory-replenishment-constraints->primary-secondary-distribution}
+\end{figure}
+
+
+
+In the same way,
+we can define the primary and secondary \entity{report} lead times,
+and the primary and secondary \entity{shipment} lead times,
+and primary and secondary \entity{shipment schedules}.
+This is illustrated in
+\autoref{figure:conceptual-model->inventory-replenishment:primary-secondary-lead-times}.
+
+\begin{figure}[h!]
+  \centering
+  \def \myyshift {0mm}
+  \tikzset{node distance=25mm}
+  \centering
+  \begin{tikzpicture}
+    % Facilities
+    \node[facility] (nat)                {National Facility};
+    \node[facility] (reg) [right=of nat] {Regional Facility};
+    \node[facility] (ret) [right=of reg] {Retail Facility};
+
+    % Report flows
+    \draw[reportflow]
+        (reg.north west) -- 
+        node[auto,above,text width=20mm,align=center,font=\footnotesize]
+            {Primary report lead time}
+        (nat.north east);
+
+    \draw[reportflow]
+        (ret.north west) -- 
+        node[auto,above,text width=20mm,align=center,font=\footnotesize]
+            {Secondary report lead time}
+        (reg.north east);
+    % Inventory flows
+    \draw[invflow]
+        (nat.south east) -- 
+        node[auto,below,text width=20mm,align=center,font=\footnotesize]
+            {Primary shipment lead time}
+        (reg.south west);
+    \draw[invflow]
+        (reg.south east) -- 
+        node[auto,below,text width=20mm,align=center,font=\footnotesize]
+            {Secondary shipment lead time}
+        (ret.south west);
+  \end{tikzpicture}
+  \caption{Illustration of primary/secondary report/shipment lead times.}
+  \label{figure:conceptual-model->inventory-replenishment:primary-secondary-lead-times}
+\end{figure}
+
+
+
+
+It is assumed that the primary and secondary \entity{shipment schedules}
+are invariable.
+
+It is assumed that the \entity{report} lead time is constant and deterministic,
+and that the primary \entity{report} lead time
+is equal to the secondary \entity{report} lead time.
+
+In general, the \entity{shipment} lead times are random
+and can be non-stationary.
+
+
+
+
+
+\subsection{Intermediate Stocking Configuration}
+\label{subsection:conceptual-model->inventory-replenishment->istock}
+
+In an \entity{intermediate stocking configuration},
+each \entity{regional facility} maintains a common pool of inventory,
+from which replenishment shipments are made
+to all \entity{retail facilities} in its region.
+This is illustrated in
+\autoref{figure:conceptual-model->istock-vs-xdock}.
+
+\begin{figure}[h!]
+\centering
+\def \myyshift {3mm}
+\tikzset{node distance=25mm}
+\begin{subfigure}{\textwidth}
+  \centering
+  \begin{tikzpicture}
+    % Facilities
+    \node[facility] (nat)                {National Facility};
+    \node[facility] (reg) [right=of nat] {Regional Facility};
+    \node[facility] (ret) [right=of reg] {Retail Facility};
+
+    % Reports
+    \draw[->,line width=2pt,dashed]
+        ([yshift=\myyshift]ret.west) --
+        node[auto,mail,above] {Report}
+        ([yshift=\myyshift]reg.east);
+    \draw[->,line width=2pt,dashed]
+        ([yshift=\myyshift]reg.west) --
+        node[auto,mail,above] {Report}
+        ([yshift=\myyshift]nat.east);
+
+    % Shipments
+    \draw[->,line width=2pt]
+        ([yshift=-\myyshift]nat.east) --
+        node[auto,mail,below] {Shipment}
+        ([yshift=-\myyshift]reg.west);
+    \draw[->,line width=2pt]
+        ([yshift=-\myyshift]reg.east) --
+        node[auto,mail,below] {Shipment}
+        ([yshift=-\myyshift]ret.west);
+  \end{tikzpicture}
+  \captionof{figure}{Intermediate stocking configuration}
+\end{subfigure}
+\\
+\begin{subfigure}{\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \node[facility] (nat)                {National Facility};
+    \node[facility,fill opacity=0.2] (reg) [right=of nat] {Regional Facility};
+    \node[facility] (ret) [right=of reg] {Retail Facility};
+
+    % Report
+    \draw[->,line width=2pt,dashed]
+        ([yshift=\myyshift]ret.west) --
+        node[auto,mail,above] {Report}
+        ([yshift=\myyshift]nat.east);
+
+    % Shipment
+    \draw[->,line width=2pt]
+        ([yshift=-\myyshift]nat.east) --
+        node[auto,mail,below] {Shipment}
+        ([yshift=-\myyshift]ret.west);
+  \end{tikzpicture}
+  \captionof{figure}{Cross-docking configuration}
+\end{subfigure}
+\caption{
+  Illustration of the flow of information and inventory
+  in the intermediate stocking and cross-docking
+  supply chain configurations.
+}
+\label{figure:conceptual-model->istock-vs-xdock}
+\end{figure}
+
+
+
+In an intermediate stocking configuration,
+there are two types of (supplier, customer) relationships.
+\begin{itemize}
+\item
+In the (\entity{national facility}, \entity{regional facility}) relationship,
+the \entity{report} lead time is the primary \entity{report} lead time,
+the \entity{shipment} lead time is the primary \entity{report} lead time,
+and the \entity{shipment schedule} is the primary \entity{shipment schedule}.
+\item
+In the (\entity{regional facility}, \entity{retail facility}) relationship,
+the \entity{report} lead time is the secondary \entity{report} lead time,
+the \entity{shipment} lead time is the secondary \entity{report} lead time,
+and the \entity{shipment schedule} is the secondary \entity{shipment schedule}.
+\end{itemize}
+
+
+
+
+
+\subsection{Cross-docking Replenishment}
+\label{subsection:conceptual-model->inventory-replenishment->xdock}
+
+In a cross-docking configuration,
+a \entity{retail facility} submits a \entity{report}
+which passes through its respective \entity{regional facility}
+to the \entity{national facility};
+upon receipt of the \entity{report},
+the \entity{national facility} makes a \entity{shipment}
+that passes through the \entity{regional facility}
+to be received by the \entity{retail facility}.
+When the supply chain is operated in a cross-docking configuration,
+Any inventory held in a \entity{regional facility} is consigned
+for a particular \entity{retail facility}.
+This is illustrated in
+\autoref{figure:conceptual-model->istock-vs-xdock}.
+
+In a cross-docking configuration,
+there is only onetype of (supplier, customer) relationship
+which is (\entity{national facility}, \entity{retail facility}).
+It is assumed that once a \entity{regional facility}
+receives a \entity{shipment} intended for
+a \entity{retail facility} in its region,
+the \entity{regional facility} immediately initiates delivery,
+so the \entity{shipment} is received at the \entity{retail facility}
+after the secondary \entity{shipment} lead time.
+In this relationship,
+the \entity{report} lead time is
+the sum of the primary and secondary \entity{report} lead times;
+the \entity{shipment} lead time is
+the sum of the primary and secondary \entity{shipment} lead times;
+and the \entity{shipment schedule} is
+the primary \entity{shipment schedule}.
+
+
+
+
+
+\section{Sequence of Events in Each Period}
+\label{section:conceptual-model->sequence-of-events}
+
+The supply chain is operated
+in either an \entity{intermediate stocking} configuration
+or a \entity{cross-docking configuration}.
+In either configuration,
+the sequence of events in each period follows the following pattern:
+\begin{enumerate}
+\item
+\textbf{Customer facilities submit reports.}
+For each (supplier, customer) relationship,
+if the current period is a reporting period,
+then a customer facility submits a \entity{report} to a supplier facility.
+The order of \entity{report} submission
+is from facilities in the lowest tier to the highest tier,
+i.e.\ \entity{retail facilities} submit \entity{reports}
+before \entity{regional facilities}.
+\item
+\textbf{Facilities receive shipments and make shipments.}
+For each facility,
+receive \entity{shipments} and make \entity{shipments} (if applicable).
+First, the exogeneous supplier makes a \entity{shipment}
+to the \entity{national facility}
+according to the \entity{national replenishment policy}.
+Then in the order of highest tier to the lowest tier,
+facilities receive \entity{shipments}
+and make \entity{shipments} (if applicable).
+In other words,
+first the \entity{national facility} receives and makes \entity{shipments},
+then the \entity{regional facilities} receive and make \entity{shipments},
+and finally the \entity{retail facilities} receive \entity{shipments}.
+\item
+\textbf{Customers arrive at retail facilities.}
+Customers arrive at \entity{retail facilities},
+depleting inventory and incurring unmet demand (if applicable).
+\end{enumerate}
+
+
+
+The pseudocode for the detailed sequence of events
+in an \entity{intermediate stocking} configuration
+is shown in \autoref{algo:conceptual-model->sequence->istock};
+while the pseudocode for the detailed sequence of events
+in an \entity{cross-docking} configuration
+is shown in \autoref{algo:conceptual-model->sequence->xdock}.
+
+
+\begin{algorithm}[h!]
+\begin{algorithmic}
+\State $t \gets$ start period
+\While{$t \leq$ end period}
+    \State \algocomment{submit reports}
+    \ForAll{(regional, retail) is a SCR}
+        \If{is reporting period for customer facility}
+            \State customer facility submits report to supplier facility
+        \EndIf
+    \EndFor
+    \ForAll{(national, regional) is a SCR}
+        \If{is reporting period for customer facility}
+            \State customer facility submits report to supplier facility
+        \EndIf
+    \EndFor
+    \State \algocomment{receive shipments and make shipments}
+    \State exogeneous supplier
+        makes {shipments} to {national facility}
+    \State {national facility} receives {shipments}
+    \ForAll{regional facility}
+        \State {regional facility} receives {shipments}
+        \State {regional facility} makes {shipments}
+            to {retail facilities}
+    \EndFor
+    \ForAll{retail facility}
+        \State {retail facility} receives {shipments}
+    \EndFor
+    \State \algocomment{demand arrives}
+    \ForAll{retail facility}
+        \State demand arrives at {retail facility}
+    \EndFor
+\EndWhile
+\end{algorithmic}
+\caption{Pseudocode for sequence of events in each period
+for the intermediate stocking simulator.}
+\label{algo:conceptual-model->sequence->istock}
+\end{algorithm}
+
+
+
+
+
+\begin{algorithm}[h!]
+\begin{algorithmic}
+\State $t \gets$ start period
+\While{$t \leq$ end period}
+    \State \algocomment{submit reports}
+    \ForAll{retail facility}
+        \If{is reporting period for customer facility}
+            \State retail facility submits report to national facility
+        \EndIf
+    \EndFor
+    \State \algocomment{receive shipments and make shipments}
+    \State exogeneous supplier
+        makes {shipments} to {national facility}
+    \State {national facility} receives {shipments}
+    \State {national facility} makes {shipments}
+            to {retail facilities}
+    \ForAll{retail facility}
+        \State {retail facility} receives {shipments}
+    \EndFor
+    \State \algocomment{demand arrives}
+    \ForAll{retail facility}
+        \State demand arrives at {retail facility}
+    \EndFor
+\EndWhile
+\end{algorithmic}
+\caption{Pseudocode for sequence of events in each period
+for the cross-docking simulator.}
+\label{algo:conceptual-model->sequence->xdock}
+\end{algorithm}
+
+\clearpage
+
+
+
+
+
+\section{Simulation Replication}
+\label{section:conceptual-model->simulator-replication}
+
+A simulation run of \scs\ can be characterized by three separate components:
+\begin{itemize}
+  \item Exogeneous components
+  \item Replenishment process components
+  \item Initial state
+  \item Simulation run parameters
+\end{itemize}
+
+The following components of the supply chain
+are assumed to be exogeneous,
+and independent of the replenishment process
+and the simulation run parameters:
+\begin{itemize}
+  \item supply chain topology
+  \item shipment lead time model
+  \item report lead time model
+  \item demand model model
+  \item replenishment policy for national facility
+  \item national facility to regional facility shipment schedule
+\end{itemize}
+
+The replenishment process depends on the supply chain configuration.
+\begin{itemize}
+  \item
+    In an intermediate stocking configuration,
+    the replenishment process is defined by:
+    \begin{itemize}
+      \item replenishment policy for regional facilities
+      \item replenishment policy for retail facilities
+      \item regional facility to retail facility shipment schedule
+    \end{itemize}
+  \item
+    In a cross-docking configuration,
+    the replenishment process depends only on the retail replenishment policy.
+\end{itemize}
+
+The initial state of the supply chain is defined by
+\begin{itemize}
+  \item The inventory level at the \entity{national facility}
+  \item The inventory level at each \entity{regional facility}
+    (only in the intermediate stocking configuration)
+  \item The inventory level at each \entity{retail facility}
+\end{itemize}
+
+The simulation run parameters are:
+\begin{itemize}
+  \item initial inventory level at national, regional, retail facilities
+  \item simulation start and end periods
+  \item random seed (i.e.\ the number used to initialize
+    a pseudorandom number generator)
+\end{itemize}
+
+
+
+

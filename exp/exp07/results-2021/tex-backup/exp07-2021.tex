@@ -1,0 +1,69 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+\usepackage[paperheight=35cm,paperwidth=25cm,margin=1cm]{geometry}
+
+\pgfplotsset{compat=1.12}
+
+\newcolumntype{M}{>{\centering\arraybackslash}m{\dimexpr.48\linewidth-2\tabcolsep}}
+
+\pagenumbering{gobble} % Remove page numbers (and reset to 1)
+
+%\pgfplotscreateplotcyclelist{mystyle}{
+%teal,every mark/.append style={fill=teal!80!black},mark=*\\%
+%orange,every mark/.append style={fill=orange!80!black},mark=square*\\%
+%cyan!60!black,every mark/.append style={fill=cyan!80!black},mark=otimes*\\%
+%lime!80!black,mark=star\\%
+%lime!80!black,every mark/.append style={fill=lime},mark=diamond*\\%
+%}
+
+\pgfplotscreateplotcyclelist{mystyle}{
+black,every mark/.append style={fill=white},mark=otimes*\\%
+black,dashed,every mark/.append style={fill=white},mark=otimes*\\%
+green!80!black,every mark/.append style={fill=white},mark=square*\\%
+green!80!black,dashed,every mark/.append style={fill=white},mark=square*\\%
+blue,every mark/.append style={fill=blue},mark=*\\%
+blue,dashed,every mark/.append style={fill=blue},mark=*\\%
+red,mark=star\\%
+red,every mark/.append style={fill=lime},mark=diamond*\\%
+}
+
+\title{exp07-2021.tex}
+\author{Zachary Leung}
+\date{2021-03-20}
+
+\begin{document}
+
+\maketitle
+
+\begin{verbatim}
+inputFolder = "input/zambia";
+\end{verbatim}
+\verbatiminput{0025/out.txt}
+\begin{verbatim}
+Note: the relative margin of error (RMOE) is defined as the half-width
+of the 95% confidence interval, divided by the mean estimate.
+\end{verbatim}
+
+\vspace{10mm}
+
+\pgfplotsset{width=10cm,height=9cm}
+
+\begin{center}
+\begin{tabular}{MM}
+\input{all-figure-1}
+&
+\input{all-figure-2}
+\\
+\input{all-figure-3}
+&
+\ref{the legend reference}
+\end{tabular}
+\end{center}
+
+\input{lsi-policies}
+
+\end{document}

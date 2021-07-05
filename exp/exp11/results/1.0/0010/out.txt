@@ -1,0 +1,2 @@
+number of replications = 10
+max RMOE               = 0.111892

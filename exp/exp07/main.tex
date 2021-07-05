@@ -1,0 +1,96 @@
+\documentclass[12pt]{article}
+
+\usepackage{array}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+
+\pgfplotsset{compat=1.9}
+
+\newcolumntype{M}{>{\centering\arraybackslash}m{\dimexpr.5\linewidth-2\tabcolsep}}
+
+\begin{document}
+
+\verbatiminput{java/time.dat}
+
+\input{metrics-existing}
+\input{metrics-forecast}
+
+\pgfplotsset{width=\textwidth,height=\textheight}
+\begin{figure}[h!]
+    \begin{tikzpicture}
+      \begin{axis}[
+          title={(a)},
+          xlabel=Supply/Demand Ratio,
+          ylabel=System Service Level,
+          ymin=0.5,ymax=1,
+          legend pos=south east]
+          
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/istock.csv};
+        \addlegendentry{istock}
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/xdock-past.csv};
+        \addlegendentry{xdock past}
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/xdock-lsi.csv};
+        \addlegendentry{LSI}
+        
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/xdock-forecast-bad-delay-1.csv};
+        \addlegendentry{xdock forecast bad}
+        
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/xdock-forecast-good-delay-0.csv};
+        \addlegendentry{xdock forecast good}
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/opt-forecast-bad-delay-1.csv};
+        \addlegendentry{opt bad}
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/opt-forecast-good-delay-0.csv};
+        \addlegendentry{opt good}
+
+        \addplot
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/clair.csv};
+        \addlegendentry{clair}
+
+      \end{axis}
+    \end{tikzpicture}
+\end{figure}
+
+\end{document}

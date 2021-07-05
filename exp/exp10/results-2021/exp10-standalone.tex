@@ -1,0 +1,62 @@
+% I can't get the standalone package to work.  It looks like the easiest
+% way to make this figure work is to crop it by hand in MacOS Preview.
+\documentclass{article}
+%\documentclass[12pt,varwidth]{standalone}
+%\documentclass{standalone}
+%\documentclass[12pt,float]{standalone}
+%\documentclass[float]{standalone}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+%\usepackage{subcaption}
+\usepackage[labelformat=parens,aboveskip=1pt]{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage{verbatim}
+
+%\renewcommand\thesubfigure{(\alph{subfigure})}
+
+\title{exp10-2021.tex}
+\author{Zachary Leung}
+\date{2021-03-19}
+
+\begin{document}
+
+\maketitle
+
+% No page number
+\pagenumbering{gobble}
+
+\begin{verbatim}
+inputFolder = "input/zambia";
+\end{verbatim}
+\verbatiminput{0150/out.txt}
+\begin{verbatim}
+Note: the relative margin of error (RMOE) is defined as the half-width
+of the 95% confidence interval, divided by the mean estimate.
+\end{verbatim}
+
+\clearpage
+
+\begin{figure}[h!]
+    \begin{subfigure}[t]{0.48\textwidth}
+        \caption{$4 \times AMI - IP$}
+        \includegraphics[width=\textwidth]{plot-current}
+    \end{subfigure}%
+    ~~~~~
+    \begin{subfigure}[t]{0.48\textwidth}
+        \caption{$4 \times AMD[-12,9]-IP$}
+        \includegraphics[width=\textwidth]{plot-last-year}
+    \end{subfigure}%
+    \\[5mm]
+    \begin{subfigure}[t]{0.48\textwidth}
+        \caption{$4 \times LSI\times AMD - I$}
+        \includegraphics[width=\textwidth]{plot-lsi}
+    \end{subfigure}%
+    ~~~~~
+    \begin{subfigure}[t]{0.48\textwidth}
+        \caption{$OPT^{16}_{0.99}$}
+        \includegraphics[width=\textwidth]{plot-opt}
+    \end{subfigure}%
+\end{figure}
+\end{document}
+

@@ -1,0 +1,999 @@
+\chapter[Computer Model (\scs)]{Computer Model of Supply Chain}
+\label{chapter:implementation}
+
+\section{Overview}
+
+In this chapter,
+we describe the computer model of the supply chain.
+In other words,
+we describe the software implementation
+of the conceptual model of the supply chain
+which was described in \autoref{chapter:conceptual-model}.
+
+
+In \autoref{section:scs->computer-model->java-programming},
+we give the reader a brief introduction
+to the Java\texttrademark\  programming language.
+In \autoref{section:scs->computer-model->software-engineering-tools}
+we explain some of the software engineering tools
+that we used in the software implementation and documentation of \scs.
+In \autoref{section:scs->computer-model->controller-objects},
+we describe the controller objects which implement the supply chain logic
+which was described in \autoref{chapter:conceptual-model}.
+The following three sections each describe
+the computer implementation of an element in the supply chain,
+the supply chain topology in
+\autoref{section:scs->computer-model->supply-chain-topology},
+the exogeneous supply and demand in 
+\autoref{section:scs->computer-model->supply-and-demand},
+the inventory replenishment process in
+\autoref{section:scs->computer-model->replenishment-process}.
+While reading these three sections,
+it may be useful for the reader to refer to the
+corresponding section in \autoref{chapter:conceptual-model}.
+Finally, in \autoref{section:scs->computer-model->design-of-experiments}
+we describe how to design computer experiments.
+
+\paragraph{Notation}
+In this chapter,
+we use typewriter font, e.g.\ \code{NationalFacility},
+to denote the name of a Java class.
+The code lisitings, e.g.\ \autoref{figure:hello-world}
+also use the typewriter font.
+
+
+
+
+
+\section{Essentials of Java Programming}
+\label{section:scs->computer-model->java-programming}
+
+\subsection{Hello World}
+
+In the Java programming language,
+every application must contain a \code{main} method.
+This is the entry point of the application
+and will subsequently invoke all the other methods required by your program.
+For example, the famous ``Hello World'' program in Java
+is shown in \autoref{figure:hello-world}.
+For more information about the \code{main} method,
+see \citet{java-tutorials->hello-world}.
+
+
+
+\begin{figure}[h!]
+\begin{lstlisting}
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello world");
+    }
+}
+\end{lstlisting}
+\caption{The famous ``Hello world'' program in Java}
+\label{figure:hello-world}
+\end{figure}
+
+
+
+
+
+\subsection{Object-Oriented Programming}
+
+In an object-oriented programming paradigm,
+the computer program creates software objects,
+which are models of real-world objects.
+A software object has an internal state
+and methods which model
+the interaction of the real-world object
+with other objects or the external environment.
+The computer program accomplishes its goal
+by guiding the interaction of its software objects.
+
+In the Java programming language,
+a software object is created by instantiating a class.
+A \emph{class} is a blueprint or prototype that defines
+how to create a software object,
+and what is the state and behavior of the software object.
+For example, the code in
+\autoref{figure:scs->computer-model->dog-class}
+is an example of a class definition for the class \code{Dog}.
+The class definition
+defines the state of a software dog object (the dog's breed and name)
+and its behavior (the dog can print its breed and name to the console).
+
+\begin{figure}[h!]
+\begin{lstlisting}
+public class Dog {
+    private String breed;
+    private String name;
+
+    public Dog(String breed, String name) {
+        this.breed = breed;
+        this.name = name;
+    }
+
+    public void print() {
+        System.out.printf("Dog{breed=%s,name=%s}%n", breed, name);
+    }
+}
+\end{lstlisting}
+\caption{Definition of the class \protect\code{Dog}.}
+\label{figure:scs->computer-model->dog-class}
+\end{figure}
+
+For more information about OOP concepts,
+we refer the reader to \citet{java-tutorials->oop-concepts}.
+
+
+\scs\ is written using an OOP paradigm.
+In other words, each entity in the conceptual model of the supply chain
+is modeled by a software object in the simulation
+(see \autoref{table:scs->computer-model->supply-chain-topology}).
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+  Java class & Conceptual entity \\
+\midrule
+    \code{Topology}
+  &
+    Supply chain topology
+\\
+    \code{NationalFacility}
+  &
+    National facility
+\\
+    \code{RegionalFacility}
+  &
+    Regional facility
+\\
+    \code{RetailFacility}
+  &
+    Retail facility
+\\
+    \code{Shipment}
+  &
+    Shipment
+\\
+    \code{Report}
+  &
+    Report
+\\
+    \code{NationalSupplySchedule}
+  &
+    Supply schedule for national facility
+\\
+    \code{DemandModel}
+  &
+    Demand model
+\\
+    \code{LeadTime}
+  &
+    Lead time model
+\\
+    \code{AbstractReplenishmentPolicy}
+  &
+    Inventory replenishment policy
+\\
+\bottomrule
+\end{tabular}
+\caption{Java classes that implement conceptual entities
+in the supply chain topology.}
+\label{table:scs->computer-model->supply-chain-topology}
+\end{table}
+
+
+
+
+Java supports an object-oriented programming concept
+which is refered to as \emph{inheritance}.
+This is explained by the Oracle lesson on inheritance
+\cite{java-tutorials->inheritance}
+as follows:
+\begin{quotation}
+Certain objects can have common states and behaviors.
+For example, mountain bikes, road bikes, and tandem bikes
+share certain characteristics of bicycles such as
+current speed and current gear.
+Yet each also defines additional features that make them different.
+Object-oriented programming allows classes to \emph{inherit}
+commonly used state and behavior from other classes.
+In this example,
+\code{Bicycle} now becomes the superclass
+of \code{MountainBike}, \code{RoadBike}, and \code{TandemBike}.
+\end{quotation}
+
+
+
+
+\subsection{Packages}
+
+
+A large software project can have a large number of Java classes.
+For example, the implementation of \scs\ has more than 80 classes.
+If the classes were not organized in some way,
+it would be hard to for a programmer
+to know what classes are related
+and how classes work together to achieve a desired functionality.
+
+In order to manage large and complex software projects,
+people use a software design technique known as \emph{modular programming}.
+With modular programming, the software project
+is divided into distinct modules,
+such that each module is responsible for
+one and only one aspect of the desired functionality.
+
+Java supports modular programming through its package mechanism
+\citep{java-tutorials->packages}.
+The computer implementation of \scs\ is composed of the packages
+shown in \autoref{table:scs->computer-model->packages}.
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+  Java package & Concern \\
+\midrule
+    \code{com.gly.random}
+  & Random variables
+\\
+    \code{com.gly.util}
+  & Utility classes
+\\
+    \code{com.gly.scs.data}
+  & The repository classes
+\\
+    \code{com.gly.scs.demand}
+  & Demand models
+\\
+    \code{com.gly.scs.domain}
+  & Entities in the supply chain
+\\
+    \code{com.gly.scs.leadtime}
+  & Lead time models
+\\
+    \code{com.gly.scs.main}
+  & Classes with \code{main} methods
+\\
+    \code{com.gly.replen}
+  & Replenishment policies
+\\
+    \code{com.gly.scs.sched}
+  & Shipment schedules
+\\
+    \code{com.gly.sim}
+  & Controller objects
+\\
+\bottomrule
+\end{tabular}
+\caption{Packages in the \scs\ computer code.}
+\label{table:scs->computer-model->packages}
+\end{table}
+
+
+
+
+
+\section{Software Engineering Tools}
+\label{section:scs->computer-model->software-engineering-tools}
+
+\subsection{Unified Modeling Language}
+
+In this chapter,
+we use UML class diagrams to visualize the fields and methods of classes
+and the interrelationships between classes.
+UML class diagrams are a standard tool in the field of software engineering.
+Wikipedia \citep{wikipedia->uml}
+describes the Unified Modeling Language (UML) as follows:
+\begin{quote}
+The Unified Modeling Language (UML) is a general-purpose modeling language in the field of software engineering, which is designed to provide a standard way to visualize the design of a system.
+\end{quote}
+
+In particular, one of the components of UML is the UML class diagram
+which Wikipedia \citep{wikipedia->uml-class-diagram} desribes as follows:
+\begin{quote}
+In software engineering, a class diagram in the Unified Modeling Language (UML) is a type of static structure diagram that describes the structure of a system by showing the system's classes, their attributes, operations (or methods), and the relationships among objects.
+\end{quote}
+
+A simple example of the UML class diagram of the \code{Dog} class
+defined above in 
+\autoref{figure:scs->computer-model->dog-class}
+is shown in
+\autoref{figure:scs-computer-model->dog-uml-class-diagram}.
+
+It can be seen that a class is represented by a rectangle
+which is divided into three parts:
+\begin{itemize}
+\item
+The top part contains the name of the class.
+\item
+The middle part contains the attributes of the class.
+\item
+The bottom part gives the methods or operations the class can take or undertake.
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\begin{myuml}
+  \begin{class}[text width=8cm]{Dog}{0,0}
+    \attribute{-breed : String}
+    \attribute{-name : String}
+    \operation{+print() : void}
+  \end{class}
+\end{myuml}
+\caption{UML class diagram of the \protect\code{Dog} class.}
+\label{figure:scs-computer-model->dog-uml-class-diagram}
+\end{figure}
+
+
+
+
+
+
+\subsection{Software Design Patterns}
+
+In the implementation of \scs,
+we make use of \emph{software design patterns}.
+Wikipedia explains what are software design patterns
+and why they are used:
+\begin{quotation}
+In software engineering,
+a design pattern is a general reusable solution
+to a commonly occurring problem within a given context in software design.
+A design pattern is a description or template
+for how to solve a problem that can be used in many different situations.
+Patterns are formalized best practices
+that the programmer can use to solve common problems
+when designing an application or system.
+\end{quotation}
+
+For more information about software design patterns,
+refer to the seminal book on design patterns: \cite{gang-of-four-1994}.
+
+
+
+
+
+\subsubsection{Builder design pattern}
+
+The \emph{builder design pattern}
+is useful when the construction of an object requires many parameters.
+The builder design pattern uses a builder object
+which receives each initialization parameter step by step
+and then returns the resulting constructed object at once.
+
+We illustrate the use of the builder design pattern using a simple example
+of a \code{Person} class,
+which has fields \code{firstName}, \code{lastName} and \code{salutation}.
+
+\begin{lstlisting}
+public class Person {
+    private String firstName;
+    private String lastName;
+    private String salutation;
+}
+\end{lstlisting}
+
+The traditional Java constructor approach might define a constructor
+\begin{lstlisting}
+Person(String firstName, String lastName, String salutation)
+\end{lstlisting}
+However, if a user is not careful,
+the user may call the constructor with the wrong order of parameters:
+\begin{lstlisting}
+Person person = new Person("Barack", "Obama", "President") // right!
+Person person = new Person("President", "Barack", "Obama") // wrong!
+\end{lstlisting}
+
+In contrast, a builder object can be used
+to instantiate a \code{Person} object as follows:
+\begin{lstlisting}
+Person person = new Person.Builder()
+        .withFirstName("Barack")
+        .withLastName("Obama")
+        .withSalutation("President")
+        .build();
+\end{lstlisting}
+
+As the previous code snippets show,
+using the builder design pattern makes the code more readable
+and less error-prone.
+
+\scs\ uses the builder design pattern to create objects
+which require many parameters in their creation,
+e.g.\ the classes \code{Shipment}, \code{IstockSimulator}, among others.
+For instance, the code to create a \code{Shipment} object
+is shown in \autoref{figure:scs->computer-model->create-a-Shipment-object}.
+
+\begin{figure}[h!]
+\begin{lstlisting}
+// create a new shipment object
+Shipment shipment = new Shipment.Builder()
+.withPeriodReceived(period + thisLeadTime.getLeadTime(to.getId(), period))
+.withPeriodSent(period)
+.withQuantity(quantity)
+.withTo(to)
+.build();
+\end{lstlisting}
+\caption{Code to create a \code{Shipment} object,
+which uses the builder design pattern.}
+\label{figure:scs->computer-model->create-a-Shipment-object}
+\end{figure}
+created using.
+
+
+
+
+
+\subsubsection{Abstract factory design pattern}
+
+The \emph{abstract factory design pattern} is a creational design pattern.
+As defined by \cite{gang-of-four-1994},
+the goal of using the abstract factory design pattern is to
+``provides an interface for creating families
+of related or dependent objects without specifying their concrete classes.''
+
+We illustrate the abstract factory design pattern using the following example.
+
+Suppose that we were writing
+a graphical design application for drawing shapes.
+The abstract \code{Shape} class
+defines the \code{draw} and \code{move} methods
+which must be implemented by its concrete subclasses:
+\code{Circle}, \code{Triangle} and \code{Rectangle}.
+We can define an abstract \code{ShapeFactory} class
+with an abstract method \code{createShape}.
+Then we can define subclasses of the \code{ShapeFactory} class
+as factories for each of the shapes:
+\code{CircleFactory}, \code{TriangleFactory}, \code{RectangleFactory}.
+By using the abstract factory design pattern,
+we can use the same code
+in the source code of the graphical design application
+for drawing shapes.
+When the user specifies which shape to draw,
+the user interface object can create
+a corresponding \code{ShapeFactory} object
+which is passed to the graphical design object.
+The code in the controller object might look like the following:
+\begin{lstlisting}
+ShapeFactory shapeFactory = 
+        userInterface.getShapeFactoryFromUser();
+graphicalDesign.drawShape(shapeFactory.createShape());
+\end{lstlisting}
+
+\scs\ uses the abstract factory design pattern
+in the controller objects
+(see \autoref{section:scs->computer-model->controller-objects})
+to create the demand model object and lead time model objects.
+
+
+
+
+
+\subsubsection{Repository Design Pattern}
+
+Using the terminology of \cite{evans-2004},
+the \emph{repository design pattern}
+is used to create an abstraction between the domain and data layer.
+We do not define what is a domain layer or a data layer.
+(We refer interested readers to the book.)
+Instead, to illustrate how the repository design pattern works,
+we consider the example of a shipment repository.
+The \code{ShipmentRepository} class defines an object
+which acts as a repository for all \code{Shipment} objects,
+i.e.\ all \code{Shipment} objects
+are stored within the \code{ShipmentRepository} class.
+The \code{ShipmentRepository} class has methods
+both for adding new \code{Shipment} objects into the repository,
+and for removing all \code{Shipment} objects matching certain criteria.
+Therefore, the \code{ShipmentRepository} class
+hides the internal details of how it manages \code{Shipment} objects,
+and allows other classes to use
+the interface defined by the \code{ShipmentRepository} class
+to add, access or remove \code{Shipment} objects.
+This is advantageous because it encapsulates all the code
+related to the storage and retrieval of \code{Shipment} objects
+in a single \code{ShipmentRepository} class,
+which we can be test systematically.
+
+\scs\ uses repository objects to manage
+facilities (\code{FacilityRepository}),
+shipments (\code{ShipmentRepository})
+and reports (\code{ReportRepository}).
+
+
+
+
+\section{Controller Objects}
+\label{section:scs->computer-model->controller-objects}
+
+In an OOP paradigm,
+every domain object (entity in the conceptual model of the supply chain)
+is represented by a software object in the computer code.
+Therefore, we define software objects such as
+\code{RetailFacility}, \code{Shipment} and \code{Report}
+to model entities in the domain which is a supply chain.
+We use \emph{controller objects}
+in order to coordinate the interaction
+of the domain objects in the supply chain
+and to implement the control logic specified in the Conceptual Model chapter.
+For example, the controller object
+gets a \code{Report} object from the customer facility object,
+and arranges for the \code{Report} object
+to be received by the supplier facility
+after the \code{Report} lead time specified by the
+\code{ReplenishmentPolicy} object.
+
+\begin{figure}[h!]
+\centering
+\begin{myuml}
+  \begin{abstractclass}{AbstractSimulator}{0,0}
+  \end{abstractclass}
+
+  \begin{class}{IstockSimulator}{-3,-2}
+    \inherit{AbstractSimulator}
+  \end{class}
+
+  \begin{class}{XdockSimulator}{3,-2}
+    \inherit{AbstractSimulator}
+  \end{class}
+\end{myuml}
+\caption{UML diagram illustrating
+the class hierarchy of the controller objects.}
+\label{figure:scs->computer-model->controller-objects}
+\end{figure}
+
+The class \code{AbstractSimulator} is a controller object for \scs.
+The class \code{AbstractSimulator} is an abstract class,
+and is a superclass of the two classes
+\code{IstockSimulator} and \code{XdockSimulator}.
+As suggested by their names,
+\code{IstockSimulator} is a controller object
+for a supply chain that operates in an intermediate stocking configuration,
+whereas \code{XdockSimulator} is a controller object
+for a supply chain that operates in a cross-docking configuration.
+The purpose of the \code{AbstractSimulator} class
+is to contain the definition of methods
+that are common to both its child classes.
+The class hierarchy is illstrated in
+\autoref{figure:scs->computer-model->controller-objects}.
+
+The conceptual model of the sequence of events in a period
+is defined in \autoref{section:conceptual-model->sequence-of-events},
+The sequence of events is implemented in the computer model
+in the \code{runSimulation} method
+of the class \code{AbstractSimulator}
+(see \autoref{figure:scs->computer-model->AbstractSimulator}).
+The methods \code{submitReports} and \code{receiveAndSendShipments}
+of the \code{AbstractSimulator} class are abstract.
+The subclasses \code{IstockSimulator} and \code{XdockSimulator}
+implement these abstract methods
+to implement the behavior of an
+intermediate stocking and cross-docking configuration respectively.
+
+\begin{figure}[h!]
+\begin{lstlisting}
+public abstract class AbstractSimulator {
+    /** Run the simulation. */
+    public void runSimulation(SimulationParameters simulationParameters)
+            throws Exception {
+        // create facility, demand and lead time objects
+        createObjects();
+
+        for (int t = simulationStartPeriod; t < simulationEndPeriod; ++t) {
+            // for each facility, log the beginning of period inventory level
+            logStartOfPeriodInventory(t);
+            // for each facility, submit a report to its supplier according
+            // to the replenishment policy
+            submitReports(t);
+            // for each facility, from national to regional to retail,
+            // receive shipments that are due to arrive,
+            // make shipments if applicable
+            receiveAndSendShipments(t);
+            // demand arrives at the facility
+            demandArrives(t);
+        }
+    }
+
+    protected abstract void submitReports(int t);
+
+    protected abstract void receiveAndSendShipments(int t);
+}
+\end{lstlisting}
+\caption{Abbreviated contents of the \protect\code{AbstractSimulator} class.}
+\label{figure:scs->computer-model->AbstractSimulator}
+\end{figure}
+
+
+
+
+
+\section{Supply Chain Topology}
+\label{section:scs->computer-model->supply-chain-topology}
+
+
+In the conceptual model of the supply chain,
+the supply chain has three tiers,
+a single national facility,
+one or more regional facilities,
+and one or more retail facilities.
+The three facility tiers are represented
+in the computer model of the supply chain,
+by the three classes:
+\code{NationalFacility}, \code{RegionalFacility} and \code{RetailFacility}.
+Internally, each of the facility classes
+is a subclass of the parent class \code{Facility}.
+This is illustrated in
+\autoref{figure:scs->computer-model->facilities-uml}.
+
+\begin{figure}[h!]
+\centering
+\begin{myuml}
+  \begin{abstractclass}[text width=8cm]{Facility}{0,0}
+    \attribute{-id : String}
+    \attribute{-inventory : int}
+    \attribute{-demandArray : NegativeArray$<$int$>$}
+    \attribute{-unmetDemandArray : NegativeArray$<$int$>$}
+    \attribute{-consumptionArray : NegativeArray$<$int$>$}
+    \attribute{-inventoryArray : NegativeArray$<$int$>$}
+    \attribute{-shipmentArray : NegativeArray$<$int$>$}
+    \operation{+getReportBuilder(t : int, h : int) : Report.Builder}
+    \operation{+logStartOfPeriodInventory(t : int) : void}
+    \operation{+demandArrives(t : int, d : int) : void}
+    \operation{+get and set array methods}
+  \end{abstractclass}
+
+  \begin{class}[text width=3cm]{NationalFacility}{-4,-7}
+    \inherit{Facility}
+  \end{class}
+
+  \begin{class}[text width=3cm]{RegionalFacility}{0,-7}
+    \inherit{Facility}
+  \end{class}
+
+  \begin{class}[text width=3cm]{RetailFacility}{4,-7}
+    \inherit{Facility}
+  \end{class}
+\end{myuml}
+\caption{UML diagram illustrating the implementation of the facility classes.}
+\label{figure:scs->computer-model->facilities-uml}
+\end{figure}
+
+
+The \code{Facility} class has the following fields:
+\begin{itemize}
+\item \code{id}
+A string that is a unique identifier for the facility.
+\item \code{inventory}
+The current inventory level at the facility
+\item \code{\{demand,unmetDemand,consumption,inventory,shipment\}Array}
+A record of the demand, unmet demand, consumption,
+beginning of period inventory level,
+and shipment received in each period respectively.
+\end{itemize}
+
+
+The supply chain topology
+consists of the set of facilities
+and the assignment of each retail facility to a regional facility.
+This is modeled in the computer model
+by the class \code{Topology}.
+
+
+
+
+
+\section{Exogenous Supply and Demand}
+\label{section:scs->computer-model->supply-and-demand}
+
+The national supply schedule is modeled by
+the \code{NationalSupplySchedule} object.
+Conceptually, the current implementation
+of the \code{NationalSupplySchedule} object
+is a cyclic supply schedule,
+i.e.\ a constant quantity is delivered to the national facility
+every $C$ periods where $C$ is the cycle length.
+
+The exogenous demand is modeled by the \code{DemandModel} object.
+Conceptually, the \code{DemandModel} object
+generates the random demand quantity
+for each retail facility and for each period in the simulation horizon.
+
+
+
+
+
+\section{Inventory Replenishment Process}
+\label{section:scs->computer-model->replenishment-process}
+
+A conceptual model of the inventory replenishment process
+was presented in \autoref{section:conceptual-model->inventory-replenishment}.
+By way of reminder,
+tor each (supplier, customer) relationship,
+the inventory replenishment process is the following:
+\begin{enumerate}
+\item
+The customer facility sends a report to its supplier facility.
+\item
+The supplier facility receives the report,
+and computes a replenishment quantity
+based on the inventory replenishment policy,
+the report received,
+and the current inventory level of the supplier facility.
+\item
+The shipment arrives at the customer facility.
+\end{enumerate}
+
+We describe below
+how each of the three steps are implemented in the computer code.
+
+
+
+
+
+\subsection{Implementation of Reports}
+
+\paragraph{How a customer facility submits a report}
+The \code{Facility} class has a method \code{getReportBuilder}
+which returns a \code{Report.Builder} object.
+The \code{AbstractSimulator} uses this object
+to build a \code{Report} object,
+which it inserts into a \code{Report} repository.
+
+\paragraph{How a supplier facility receives a report}
+The implementation of a supplier facility receiving a report
+is done by the \code{AbstractReplenishmentPolicy} class.
+The class is described in detail below.
+For the time being,
+we note that the method \code{getShipmentDecisions}
+of the \code{AbstractReplenishmentPolicy} class
+removes reports that are due to arrive at the
+supplier facility at the current time period
+from the \code{ReportRepository},
+and processes the reports.
+
+
+
+
+
+\subsection{Implementation of Inventory Replenishment Policies}
+
+An inventory replenishment policy is implemented in the computer code
+by the class \code{AbstractReplenishmentPolicy} which is an abstract class.
+The software architecture is shown in
+\autoref{figure:scs->computer-model->uml->replenishment-policy}.
+The class has two fields.
+\begin{enumerate}
+\item
+The field \code{oneTierReportDelay}
+which represents the number of periods of delay
+between a facility sending a report
+and the facility immediately upstream receiving the report.
+\item
+The field \code{function}
+is an \code{AbstractReplenishmentFunction},
+which is a function mapping the inputs
+(supplier facility inventory level,
+the received reports,
+the pipeline shipments,
+the demand forecast,
+the shipment schedule,
+and the lead time forecast)
+into a list of shipment decisions.
+\end{enumerate}
+
+The class \code{AbstractReplenishmentPolicy}
+is a class that wraps around an \code{Abstract\-Replenishment\-Function}.
+So if we put an order-up-to replenishment function
+into the \code{Abstract\-Replenishment\-Policy} class,
+we would get an order-up-to replenishment policy;
+and if we put an constant replenishment function
+into the \code{AbstractReplenishmentPolicy} class,
+we would get a constant replenishment policy.
+
+\begin{figure}[h!]
+\centering
+\begin{myuml}
+  \begin{abstractclass}[text width=10cm]{AbstractReplenishmentPolicy}{0,0}
+    \attribute{-oneTierReportDelay : int}
+    \attribute{-function : AbstractReplenishmentFunction}
+    \operation{getReportDelay() : int}
+    \operation{getReportHistoryPeriods() : int}
+    \operation{getShipmentDecisions(input : ReplenishmentFunctionInput)
+      : Collection<ShipmentDecision>}
+  \end{abstractclass}
+
+  \begin{abstractclass}[text width=10cm]{AbstractReplenishmentFunction}{0,-6}
+    \operation{getReportHistoryPeriods() : int}
+    \operation{getShipmentDecisions(input : ReplenishmentFunctionInput)
+      : Collection<ShipmentDecision>}
+  \end{abstractclass}
+  
+  \composition{AbstractReplenishmentPolicy}{function}{1..1}
+  {AbstractReplenishmentFunction}
+\end{myuml}
+\caption{UML class diagram illustrating how 
+the \protect\code{AbstractReplenishmentPolicy} class
+is a wrapper class around
+the \protect\code{AbstractReplenishmentFunction} class.}
+\label{figure:scs->computer-model->uml->replenishment-policy}
+\end{figure}
+
+
+
+
+
+The replenishment policy for a generic (supplier, customer) relationship
+is modeled by the \code{AbstractReplenishmentPolicy} class.
+This class has two subclasses:
+\code{AbstractOneTierReplenishmentPolicy}
+for (national facility, regional facility)
+and (regional facility, retail facility) replenishment
+in an intermediate stocking configuration;
+and \code{AbstractXdockReplenishmentPolicy}
+for (national facility, retail facility) replenishment
+in a cross-docking configuration.
+This is illustrated in
+\autoref{figure:scs->computer-model->uml->replenishment-policy-hierarchy}.
+
+\begin{figure}[h!]
+\centering
+\begin{myuml}
+  \begin{abstractclass}{AbstractReplenishmentPolicy}{0,0}
+  \end{abstractclass}
+
+  \begin{class}{IstockReplenishmentPolicy}{-3,-2}
+    \inherit{AbstractReplenishmentPolicy}
+  \end{class}
+
+  \begin{class}{XdockReplenishmentPolicy}{3,-2}
+    \inherit{AbstractReplenishmentPolicy}
+  \end{class}
+\end{myuml}
+\caption{UML class diagram illustrating the class hierarchy of 
+the \protect\code{AbstractReplenishmentPolicy} class
+and its subclasses.}
+\label{figure:scs->computer-model->uml->replenishment-policy-hierarchy}
+\end{figure}
+
+
+
+
+
+\subsection{Implementation of Shipments}
+
+\paragraph{How a supplier facility sends a shipment}
+The class \code{Abstract\-Replenishment\-Policy}
+has a method \code{getShipmentDecisions},
+which returns a list of shipment decisions
+(i.e.\ the shipment quantity and the destination customer facility).
+The class \code{AbstractSimulator}
+has a method \code{makeShipment}
+which executes this shipment decision.
+First, the method instantiates a \code{Shipment} object.
+Next, the method ``sends'' the shipment
+by adding the \code{Shipment} object into the \code{ShipmentRepository}.
+
+\paragraph{How a customer facility receives a shipment}
+The implementation of a customer facility receiving a shipment
+is found in the abstract method \code{receiveAndSendShipments}
+of the class \code{AbstractSimulator}.
+The overridden implementation of this method
+in the subclasses \code{IstockSimulator} and \code{XdockSimulator}
+use the method \code{receiveShipments}
+of the class \code{AbstractSimulator}.
+Basically, the method removes all \code{Shipment} objects
+that are due to arrive at the customer facility at the current period
+from the \code{ShipmentRepository},
+and increments the inventory level at the customer facility
+by the total inventory quantity in those \code{Shipment} objects.
+
+
+
+
+
+\section{Design of Computer Experiments}
+\label{section:scs->computer-model->design-of-experiments}
+
+One of the challenges in managing the \scs\ supply chain
+is that the demand and shipment lead times are random.
+In this section,
+we describe how the random variates
+for a particular simulation replication are generated in the computer model.
+We also discuss how to choose simulation run parameters
+such as the initial inventory level and the simulation run horizon.
+
+
+
+
+
+
+\subsection{Random Variate Generation}
+
+We chose to implement the random objects \code{Demand} and \code{LeadTime}
+as \emph{immutable} objects
+\citep{wikipedia->immutable-object},
+i.e.\ its state cannot be modified after it is created.
+This reduces programming errors because the random variates
+cannot be modified accidentally after the object is created.
+
+Another design principle for the random objects
+are that they are reproducible,
+i.e.\ for the same set of facilities,
+the same start and end periods,
+and the same random seed,
+the generated random variates are the same.
+This is advantageous from a debugging perspective,
+but also useful as a variance reduction technique.
+
+The goal of \scs\
+is to compare inventory replenishment policies through simulation.
+In order to increase the statistical precision of the estimates
+that can be obtained for a given number of iterations,
+we employ a variance reduction procedure
+where the demands and lead times
+in replication $i$ of a particular inventory policy
+are equal to the demands and lead times
+in replication $i$ of another inventory policy.
+
+
+
+
+
+\subsection{Initial Conditions}
+
+Initial inventory levels at facilities.
+For intermediate stocking configuration,
+the initial inventory level at the regional facilities and the retail facilities.
+For cross-docking configuration,
+the initial inventory level at the retail facilities.
+The level is specified as an order-up-to level.
+\todo{More details as I implement the order-up-to level object.}
+
+
+
+
+
+
+\subsection{Simulation Horizon}
+
+The goal of the simulation is to estimate
+the long-run performance of an inventory replenishment policy.
+In other words, when the supply chain system is in steady state,
+what is the expected service level, or expected average inventory level?
+
+In order to collect data when the supply chain system is in steady-state,
+it is necessary to run the simulation for a warm-up period
+before beginning the data collection period.
+
+The \emph{warm-up period} is the number of periods
+that the simulation will run before the data collection period.
+The purpose of the simulation warm-up period
+is for the system to transition
+from the initial transient conditions
+to steady-state conditions.
+
+The \emph{data collection period} is the number of periods
+that the simulation will run and data will be collected.
+
+The simulation start and end period is specified
+by the \code{SimulationParameters} object.
+Statistics of interest are obtained from the
+\code{SimulationResults} object
+which is created based on an \code{AbstractSimulator} object.
+To obtain an estimate of a statistic of interest
+based only on data during the data collection period,
+use a method while indicating the start and end periods
+of the data collection period, e.g.
+\begin{lstlisting}
+AbstractSimulator simulator = // IstockSimulator or XdockSimulator
+simulator.runSimulation(...);
+SimulationResults results = new SimulationResults(simulator);
+int startPeriod = 0;
+int endPeriod = 10;
+results.getServiceLevel(startPeriod, endPeriod);
+\end{lstlisting}
+

@@ -1,0 +1,77 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{pgfplots}
+\usepackage{verbatim}
+\usepackage[paperheight=30cm,paperwidth=245mm,margin=3cm]{geometry}
+
+\pgfplotsset{compat=1.12}
+\pgfplotsset{width=75mm,height=60mm}
+
+\newcolumntype{M}{>{\centering\arraybackslash}m{\dimexpr.48\linewidth-2\tabcolsep}}
+
+\pagenumbering{gobble} % Remove page numbers (and reset to 1)
+
+\pgfplotscreateplotcyclelist{mystyle}{
+line width=0.8pt,black,every mark/.append style={fill=white},mark=otimes*\\%
+line width=0.8pt,densely dashed,green!80!black,every mark/.append style={fill=white},mark=square*\\%
+line width=0.8pt,densely dotted,blue,every mark/.append style={fill=blue},mark=*\\%
+line width=0.8pt,red,mark=star\\%
+}
+
+\title{exp11.tex}
+\author{Zachary Leung}
+\date{2021-06-12}
+
+\begin{document}
+
+\maketitle
+
+
+
+\subsubsection*{Supply / Demand ratio = 0.8}
+\begin{verbatim}
+inputFolder = "input/zambia";
+\end{verbatim}
+\verbatiminput{0.8/0010/out.txt}
+
+
+
+\subsubsection*{Supply / Demand ratio = 1.1}
+\begin{verbatim}
+inputFolder = "input/zambia";
+\end{verbatim}
+\verbatiminput{1.1/0030/out.txt}
+
+\begin{verbatim}
+Note: the relative margin of error (RMOE) is defined as the half-width
+of the 95% confidence interval, divided by the mean estimate.
+\end{verbatim}
+
+
+
+
+
+
+
+
+\clearpage
+\begin{center}
+\begin{tabular}{MM}
+\input{figure-1}%
+&
+\input{figure-2}%
+\\
+~&~
+\\[-3mm]
+\input{figure-3}%
+&
+\input{figure-4}%
+\end{tabular}
+~\\[2mm]
+\ref{the legend reference}
+\end{center}
+
+\end{document}

@@ -1,0 +1,115 @@
+\documentclass[12pt,twocolumn]{article}
+
+\usepackage{hyperref}
+
+\newcommand{\code}[1]{{\scriptsize \texttt{#1}}}
+
+\begin{document}
+
+\tableofcontents
+
+\clearpage
+
+\section{Computer Model of Supply Chain}
+
+SCS was written using an object-oriented programming paradigm.
+In an OOP paradigm,
+every domain object (entity in the conceptual model of the supply chain)
+is represented by a software object in the computer code.
+
+\subsection{Overview}
+
+\subsection{Software Design Principles}
+
+\subsubsection{Object-Oriented Programming}
+
+\subsubsection{Software Design Patterns}
+
+\subsubsection{Random Objects}
+
+\subsection{Controller Objects}
+
+In an OOP paradigm,
+every domain object (entity in the conceptual model of the supply chain)
+is represented by a software object in the computer code.
+Therefore, we define software objects such as
+\code{RetailFacility}, \code{Shipment} and \code{Report}
+to model entities in the supply chain.
+We use \emph{controller objects}
+in order to coordinate the interaction
+of the domain objects in the supply chain
+and to implement the control logic specified in the Conceptual Model chapter.
+For example, the controller object
+gets a \code{Report} object from the customer facility object,
+and arranges for the \code{Report} object
+to be received by the supplier facility
+after the \code{Report} lead time specified by the
+\code{ReplenishmentPolicy} object.
+
+\subsection{Supply Chain Topology}
+
+The \code{Facility} class is a superclass of the
+\code{NationalFacility}, \code{RegionalFacility}
+and \code{RetailFacility} classes.
+
+The \code{Topology} class stores a mapping of each \code{RetailFacility}
+to its \code{RegionalFacility}.
+
+\subsection{Exogenous Supply and Demand}
+
+National supply schedule
+
+Demand model
+
+\subsection{Inventory Replenishment Process}
+
+\subsubsection{Basic Process}
+
+\subsubsection{Inventory Replenishment Constraints}
+
+Lead time model
+
+\subsubsection{Intermediate Stocking Configuration}
+
+\subsubsection{Cross-Docking Configuration}
+
+\subsubsection{Reports and Shipments}
+
+
+
+
+\section{Conceptual Model of Zambia Supply Chain}
+
+Here is a description of the conceptual model of the Zambia supply chain
+
+
+
+
+
+\section{Computer Model of Zambia Supply Chain}
+
+We use SCS to build a computer model of the Zambia supply chain.
+
+Here is how we map the entities
+in the conceptual model of the Zambia supply chain
+to entities in the conceptual model of the SCS supply chain.
+Show a table.
+
+\subsection{Input Files}
+
+Here are the input files for the supply chain topology,
+the demand mean, the demand forecast accuracy,
+the regional facility shipment schedule,
+primary and secondary lead times.
+
+\subsection{Replenishment Policies}
+
+We implement the order-up-to intermediate stocking policy in this class,
+the order-up-to cross-docking policy in this class,
+the clairvoyant cross-docking policy in this class
+and the optimization-based cross-docking in this class.
+
+
+
+
+\end{document}

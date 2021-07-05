@@ -1,0 +1,685 @@
+\chapter[Computer Model (Zambia)]{Computer Model of Zambia Supply Chain}
+
+We build a computer model of the Zambia supply chain using \scs,
+by mapping the entities in the Zambia supply chain
+to entities in \scs\ supply chain.
+
+
+We explain our choice of time unit in
+\autoref{section:zambia->computer-model->time-unit},
+we explain the format of the input files in section blah,
+we explain which classes implement the replenishment policies in section blah.
+
+
+
+
+\section{Mapping Entities to Classes}
+
+The mapping of entities in the conceptual model of the Zambia supply chain
+to classes in the computer model of the \scs\ supply chain
+is shown in \autoref{table:zambia:computer:zambia-to-scs-mapping}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ll}
+\toprule
+  Zambia Entity & \scs\ Class \\
+\midrule
+  National warehouse & \code{NationalFacility} \\
+  District warehouse & \code{RegionalFacility} \\
+  Health facility & \code{RetailFacility} \\
+  Order form & \code{Report} \\
+  Order-up-to replenishment policy & \code{OrderUpToReplenishmentPolicy} \\
+  Optimization & \code{GlyReplenishmentPolicy} \\
+  Clairvoyant replenishment policy & \code{ClairvoyantReplenishmentPolicy} \\
+  Vehicle accessibility lead time & \code{VehicleAccessiblityLeadTime} \\
+  Multiplicative MMFE demand model & \code{MmfeDemand} \\
+\bottomrule
+\end{tabular}
+\caption{A mapping between the entity in the Zambia supply chain
+and the \scs\ class representing that entity.}
+\label{table:zambia:computer:zambia-to-scs-mapping}
+\end{table}
+
+Both the Zambia supply chain and the \scs\ supply chain have three tiers.
+Thus, there exists a natural mapping
+from facilities in the Zambia supply chain
+to facilities in the \scs\ supply chain.
+
+
+
+\section{Input Files}
+
+The input files for the Zambia use case are found in the folder
+\begin{quote}
+\code{SupplyChainSimulator/input/zambia/}
+\end{quote}
+The input files are stored as comma-separated values (CSV) files,
+i.e.\ tabular data stored as a plain text file,
+with each field separated by a comma.
+
+
+
+
+\subsection{Supply Chain Topology}
+
+The supply chain topology for Zambia
+is defined in the input file
+\begin{quote}
+\code{SupplyChainSimulator/input/zambia/health-facilities.csv}
+\end{quote}
+\begin{figure}[h!]
+\begin{lstlisting}
+regional,retail
+chama,buli
+chama,chibale
+chama,chifunda
+\end{lstlisting}
+\caption{Partial listing of the contents of
+the file \protect\code{health-facilities.csv}.}
+\label{figure:zambia->health-facilities.csv}
+\end{figure}
+
+
+The first four lines of the file are shown
+in \autoref{figure:zambia->health-facilities.csv}.
+The first line is a header line.
+The following lines are (regional facility, retail facility) pairs.
+For instance, the second line means that a retail facility named ``Buli''
+is located in a region named ``Chama.''
+The Zambia use case has 212 health facilities
+located in 12 districts.
+
+
+
+
+
+
+
+
+
+\subsection{Demand Means}
+
+We described a procedure for estimating the mean demand at
+212 health facilities in Zambia
+in \citet{gallien-leung-yadav-2014}.
+The estimated demand means are listed in the input file
+\begin{quote}
+\code{SupplyChainSimulator/input/zambia/demand-mean.csv}
+\end{quote}
+As explained in \autoref{section:zambia->computer-model->time-unit},
+for the purposes of simulation,
+we chose to use a time unit where one period is equal to 1/48-th of a year.
+Thus, the input file defines the mean demand
+for each health facility for each period of the year.
+
+\begin{figure}[h!]
+\begin{lstlisting}
+retail,1,2,3,4,5,6,7,...
+buli,44.20,48.00,50.10,49.40,46.10,40.90,35.20,...
+chibale,133.00,152.00,171.00,186.00,196.00,201.00,202.00,199.00,...
+chifunda,47.10,58.00,67.30,72.60,73.90,72.20,69.30,66.70,...
+\end{lstlisting}
+\caption{Partial listing of the contents of
+the file \protect\code{demand-mean.csv}.}
+\label{figure:zambia->demand-mean.csv}
+\end{figure}
+
+The first four lines and first eight columns of the file are shown
+in \autoref{figure:zambia->demand-mean.csv}.
+The first line is a header line.
+The following lines are entries of the form
+(retail facility $r$, $d_{r1}, d_{r2}, \ldots$).
+For instance, the second line means that a retail facility named ``Buli''
+has mean demand in period 1 of 44.20,
+has mean demand in period 2 of 48.00,
+etc.
+
+
+
+
+\subsection{Replenishment Schedule and Lead Times}
+
+The primary shipment schedule,
+primary and secondary shipment lead times
+are defined in the input file
+\begin{quote}
+\code{SupplyChainSimulator/input/zambia/replenishment.csv}
+\end{quote}
+
+\begin{figure}[h!]
+\begin{lstlisting}
+regional,shipment offset,primary lead time,mean secondary lead time
+chama,0,3,2.308
+chavuma,0,3,2.055
+kabompo,0,3,3.621
+kaoma,1,2,3.727
+\end{lstlisting}
+\caption{Partial listing of the contents of
+the file \protect\code{replenishment.csv}.}
+\label{figure:zambia->replenishment.csv}
+\end{figure}
+
+The first five lines of the file are shown in
+\autoref{figure:zambia->replenishment.csv}.
+Each line in the input file contains 4 columns,
+corresponding to (regional facility, shipment offset,
+primary lead time, mean secondary lead time).
+\begin{itemize}
+\item
+The \emph{shipment offset} is an integer in the set $\{0,1,2,3\}$.
+If the shipment offset for a regional facility is $b$,
+then the national facility is scheduled to make a shipment
+to that regional facility in periods $t \equiv \amodb{b}{4}$.
+For example, line 2 indicates that the national facility makes shipments
+to the Chama regional facility
+during periods $\{0, 4, 8, \ldots\}$;
+while line 5 indicates that the national facility makes shipments
+to the Kaoma regional facility
+during periods $\{1, 5, 9, \ldots\}$.
+\item
+The \emph{primary lead time} is an integer,
+which represents the number of periods between
+the national facility making a shipment to a regional facility
+and the regional facility receiving the shipment.
+\item
+The \emph{mean secondary lead time} is a real number,
+which represents the mean number of periods between
+the regional facility making a shipment to a retail facility in its region
+and the retail facility receiving the shipment,
+assuming that the retail facility always has 100\% accessibility probability.
+\end{itemize}
+
+
+
+
+
+\subsection{Health Facility Accessibility}
+
+The health facility accessibility probabilities
+are defined in the input file
+\begin{quote}
+\code{SupplyChainSimulator/input/zambia/health-facilities-accessibility.csv}
+\end{quote}
+
+\begin{figure}[h!]
+\begin{lstlisting}
+Health Facility,AccessibilityJan,AccessibilityFeb,...,AccessibilityDec
+buli,0,0,0,0.75,1,1,1,1,1,1,1,0.5
+chibale,1,1,1,1,1,1,1,1,1,1,1,1
+chifunda,0,0,0,0,0.5,1,1,1,1,1,1,0.5
+\end{lstlisting}
+\caption{Partial listing of the contents of
+the file \protect\code{health-facilities-accessibility.csv}.}
+\label{figure:zambia->health-facilities-accessibility.csv}
+\end{figure}
+
+The first four lines of the file are shown in
+\autoref{figure:zambia->health-facilities-accessibility.csv}.
+Each line in the input file contains 13 columns.
+The first column is the name of the health facility.
+The next twelve columns are the probabilities
+that the health facility is accessible by a four-wheel drive vehicle
+during the particular month of the year.
+
+
+
+
+
+\section{Code Walkthrough}
+
+In this section,
+we walk through some of the computer code
+which may be of interest to researchers in the field of inventory management.
+In particular, we go over the implementation of
+inventory replenishment policies,
+demand models and lead time models.
+
+
+
+\subsection{Order-Up-To Replenishment Policies}
+
+Conceptually, there are two different versions
+of order-up-to replenishment policies:
+an intermediate stocking order-up-to replenishment policy,
+and a cross-docking order-up-to replenishment policy.
+For both these versions,
+the calculations of shipment quantities
+is implemented in the class \code{Order\-Up\-To\-Replenishment\-Function}.
+
+We now walk through the code of the class
+\code{Order\-Up\-To\-Replenishment\-Function},
+which is shown in
+\autoref{figure:zambia->computer-model->OrderUpToReplenishmentFunction}.
+The computation of the order-up-to level depends on two input parameters,
+which are fields of the class \code{Order\-Up\-To\-Replenishment\-Function}:
+\begin{itemize}
+\item
+\code{historyPeriods}
+The number of periods of demand/consumption
+for which to compute the average monthly demand/consumption.
+\item
+\code{orderUpToPeriods}
+The order-up-to level is this multiple
+of the average monthly demand/consumption.
+\end{itemize}
+The steps to calculate the shipment quantity are:
+\begin{enumerate}
+\item Calculate the mean demand per period
+\item Calculate the order-up-to level
+\item Calculate the inventory position
+\item Calculate the shipment quantity
+\end{enumerate}
+The reader can see how the code in
+\autoref{figure:zambia->computer-model->OrderUpToReplenishmentFunction}
+implements these steps to compute the shipment quantity.
+
+
+\begin{figure}[h!]
+\begin{lstlisting}
+LinkedList<ShipmentDecision> shipmentDecisions = new LinkedList<>();
+int inv = supplierFacility.getInventory();
+
+for (Report report : reports) {
+    // 1. Calculate the mean demand per period
+    double sum = 0;
+    for (int i = 0; i < historyPeriods; ++i) {
+        sum += report.getDemand(i);
+    }
+    double d = sum / historyPeriods;
+    
+    // 2. Calculate the order-up-to level
+    double out = d * orderUpToPeriods;
+    
+    // 3. Calculate the inventory position
+    int ip = report.getInventory();
+    for (Shipment shipment : report.getShipments()) {
+        ip += shipment.quantity;
+    }
+    
+    // 4. Calculate the shipment quantity
+    int q = (int) (out - ip);
+    // take the min of the intended quantity and the supplier's
+    // remaining inventory level
+    q = Math.min(q, inv);
+    inv -= q;
+    
+    // only create a shipment if the shipment quantity > 0
+    if (q > 0) {
+        ShipmentDecision shipmentDecision = new ShipmentDecision.Builder()
+        .withFacility(report.getFacility())
+        .withPeriod(currentPeriod)
+        .withQuantity(q)
+        .build();
+
+        shipmentDecisions.add(shipmentDecision);
+    }
+}
+\end{lstlisting}
+\caption{Implementation of the \code{getShipmentDecisions} method in the
+\code{OrderUpToReplenishmentFunction} class.}
+\label{figure:zambia->computer-model->OrderUpToReplenishmentFunction}
+\end{figure}
+
+The code to create an order-up-to intermediate stocking replenishment policy
+is shown in
+\autoref{figure:zambia->computer-model->create-istock-order-up-to-policies}.
+The code to create an order-up-to intermediate stocking replenishment policy
+and an order-up-to cross-docking replenishment policy
+is shown in
+\autoref{figure:zambia->computer-model->create-xdock-order-up-to-policies}.
+
+\begin{figure}[h!]
+\begin{lstlisting}
+AbstractReplenishmentFunction<Facility, LeadTime>
+        replenishmentFunction =
+        new OrderUpToReplenishmentFunction
+        .Builder<Facility, LeadTime>()
+        .withHistoryPeriods(historyPeriods)
+        .withOrderUpToPeriods(orderUpToPeriods)
+        .build();
+IstockReplenishmentPolicy istockReplenishmentPolicy =
+        new IstockReplenishmentPolicy(oneTierReportDelay,
+                replenishmentFunction);
+\end{lstlisting}
+\caption{Code to create an order-up-to
+intermediate stocking replenishment policy.}
+\label{figure:zambia->computer-model->create-istock-order-up-to-policies}
+\end{figure}
+
+
+\begin{figure}[h!]
+\begin{lstlisting}
+AbstractReplenishmentFunction<NationalFacility, XdockLeadTime> 
+        replenishmentFunction =
+        new OrderUpToReplenishmentFunction
+        .Builder<NationalFacility, XdockLeadTime>()
+        .withHistoryPeriods(historyPeriods)
+        .withOrderUpToPeriods(orderUpToPeriods)
+        .build();
+XdockReplenishmentPolicy xdockReplenishmentPolicy =
+        new XdockReplenishmentPolicy(oneTierReportDelay,
+                replenishmentFunction);
+\end{lstlisting}
+\caption{Code to create an order-up-to cross-docking replenishment policy.}
+\label{figure:zambia->computer-model->create-xdock-order-up-to-policies}
+\end{figure}
+
+
+
+
+
+\clearpage
+\subsection{Optimization Replenishment Policy}
+
+The optimization replenishment policy
+is a replenishment policy
+that is used in a cross-docking supply chain configuration.
+The optimization replenishmen policy
+is implemented in the class \code{OptimizationReplenishmentPolicy}.
+The class \code{OptimizationReplenishmentPolicy}
+is a thin class that wraps around
+the \code{Optimization\-Replenishment\-Function} class,
+which implements the logic for computing shipment quantities.
+
+This is an outline of the method \code{getShipmentDecisions}:
+\begin{enumerate}
+\item Add the decision variables to the Gurobi model.
+For example, the following code creates new decision variables
+for the start of period inventory levels
+using the method \code{model.addVar},
+and stores these decision variables into a \code{HashMap}.
+\begin{lstlisting}
+HashMap<Key, GRBVar> ir = new HashMap<>();
+for (int r = 0; r < R; ++r) {
+    for (int s = T0[r]; s <= T2; ++s) {
+        ir.put(new Key(r, s), model.addVar(0, GRB.INFINITY, 0.0,
+        GRB.CONTINUOUS, String.format("cr[%d][%d]", r, s)));
+    }
+}
+\end{lstlisting}
+
+\item Add the objective function to the Gurobi model.
+The following code defines the objective as the sum of
+the weighted inventory holding costs and the unmet demand costs
+at each health facility.
+\begin{lstlisting}
+GRBLinExpr obj = new GRBLinExpr();
+for (int r = 0; r < R; ++r) {
+    double meanAccessibility = 
+            MathUtils.getMean(reports[r].getAccessibility()); 
+    for (int s = T0[r]; s < T2; ++s) {
+        obj.addTerm(meanAccessibility, ir.get(new Key(r, s)));
+        obj.addTerm(unmetDemandCost, ur.get(new Key(r, s)));
+    }
+}
+model.setObjective(obj, GRB.MINIMIZE);
+\end{lstlisting}
+
+\item Add the constraints one-by-one to the Gurobi model.
+For example, the following code declares a new linear constraint
+that sets the initial inventory level at the national facility
+in the Gurobi optimization model
+equal to the current inventory level at the national facility
+in the computer simulation model.
+\begin{lstlisting}
+// i^N_T1 = I^N
+constr = new GRBLinExpr();
+constr.addTerm(1.0, in.get(T1));
+model.addConstr(constr, GRB.EQUAL,
+        nationalFacility.getCurrentInventoryLevel(),
+        "i^N_T1 = I^N");
+\end{lstlisting}
+
+\item Solve the Gurobi model.
+To solve the Gurobi model, just call the \code{optimize()} method,
+e.g.\ \code{model.optimize()}.
+
+\item Parse the optimal solution of the Gurobi model
+to create the shipment decisions.
+The following code reads the values
+of the shipment decision variables \code{xr}
+and executes the shipment decisions
+for positive shipment quantities that are to be sent in the current period.
+\begin{lstlisting}
+for (int r = 0; r < R; ++r) {
+    for (int s = T1; s <= T2; ++s) {
+        double q = xr.get(new Key(r, s)).get(GRB.DoubleAttr.X);
+            if (q > 0.001) {
+                if (s == T1) {
+                    decisions.add(new ShipmentDecision.Builder()
+                    .withFacility(reports[r].getFacility())
+                    .withPeriod(s)
+                    .withQuantity((int) q)
+                    .build());
+            }
+        }
+    }
+}
+\end{lstlisting}
+\end{enumerate}
+
+The following constraints are added to the Gurobi model in step 3.
+\begin{enumerate}
+\item The inventory balance equations for the national facility
+\item The inventory balance equations for each retail facility,
+which includes pipeline shipments (shipments already sent)
+and future shipments
+(shipments which we are deciding in the optimization problem)
+\item The tangent constraints which give
+a lower bound for the expected unmet demand
+\item If the national facility is not scheduled to make a shipment
+to a retail facility during a particular period,
+set the shipment quantity during that period to $0$
+\end{enumerate}
+
+We refer interested readers to \citet{gallien-leung-yadav-2014}
+for the details of the optimization formulation.
+
+
+
+
+
+
+
+\subsection{Clairvoyant Replenishment Policy}
+
+The shipment quantity computation for the clairvoyant replenishment policy
+is implemented in the class \code{ClairvoyantReplenishmentFunction}.
+The implementation is similar to that of
+the class \code{OptimizationReplenishmentFunction}.
+Likewise, the class \code{ClairvoyantReplenishmentPolicy}
+is a wrapper class around the class \code{ClairvoyantReplenishmentFunction}.
+
+
+\subsection{MMFE Demand Model}
+
+The mathematical definition of the multiplicative MMFE demand model
+can be found in \citet{heath-jackson-1994}.
+Briefly, the multiplicative MMFE demand model sets
+\[
+    \rvD_u
+  =
+    \bar{D}_u \prod_{t=u-M+1}^u \exp(\rvnu_{tu}).
+\]
+where the parameter $M$ is the number of periods
+for which demand information is revealed ahead of the actual period;
+and $\rvnu_{tu}$ is a normal random variable
+with the standard deviation $\sigma_{u-t}$
+and mean $-\sigma_{u-t}^2 / 2$,
+so that $\EX{\exp(\rvnu_{tu})} = 1$.
+Here $\rvnu_{tu}$ represents the demand uncertainty
+regarding the demand in period $u$
+that becomes known at the end of period $t$.
+
+The multiplicative MMFE demand model
+is implemented in the class \code{Mmfe\-Levels\-Single\-Facility\-Demand},
+which inherits from the abstract class
+\code{Single\-Facility\-Demand}.
+It needs to override two methods defined in the parent class:
+\code{getDemand()} and \code{getDemandForecast()}.
+
+The following code in the constructor
+generates the random variables $\rvnu_{tu}$
+and stores them into a \code{HashMap}:
+\begin{lstlisting}
+for (int t = startPeriod; t < endPeriod; ++t) {
+    for (int s = t - M + 1; s <= t; ++s) {
+        for (int k = 0; k < K; ++k) {
+            double sigma = getStandardDeviation(t - s, k);
+            double mu = - sigma * sigma / 2;
+            double r = random.nextGaussian(mu, sigma);
+            Key key = new Key(s, t, k);
+            map.put(key, r);
+        }
+    }
+}
+\end{lstlisting}
+
+The multiplicative MMFE demand model
+supports the notion of forecast levels
+in the \code{getDemandForecast()} method.
+\begin{itemize}
+\item
+For all $t \leq u$,
+the ``myopic'' forecast at period $t$ for the demand during period $u$ is
+\[
+    \rvD_{tu}^{\text{myo}}
+  =
+    \bar{D}_u \prod_{i=u-M+1}^u \exp(\rvnu_{iu}),
+\]
+so that the mean and variance of the forecast do not depend on $t$.
+For the ``myopic'' forecast,
+the variance of the forecast is not reduced over time
+as the demand forecast is updated with more current demand information
+that is revealed closer to period $u$.
+The ``myopic'' forecast is implemented in the code
+by setting the parameter \code{forecastLevel = 0}.
+
+\item
+For forecasts far ahead in the future, $t < u - M + 1$,
+the ``industry'' forecast at period $t$ for the demand during period $u$ is
+\[
+    \rvD_{tu}^{\text{ind}}
+  =
+    \bar{D}_u \prod_{i=u-M+1}^u \exp(\rvnu_{iu}).
+\]
+For forecasts closer in the future, $u - M + 1 \leq t \leq u$,
+the ``industry'' forecast at period $t$ for the demand during period $u$ is
+\[
+    \rvD_{tu}^{\text{ind}}
+  =
+    \bar{D}_u
+    \prod_{i=u-M+1}^{t-1} \exp(\nu_{iu})
+    \prod_{i=t}^u \exp(\rvnu_{iu}),
+\]
+i.e.\ for $i = u-M+1,\ldots,t-1$,
+the realizations of the random variables $\rvnu_{iu}$
+have been revealed as $\nu_{iu}$,
+so the forecast mean is updated to
+$\bar{D}_u \prod_{i=u-M+1}^{t-1} \exp(\nu_{iu})$
+and the forecast variance is reduced.
+
+\end{itemize}
+
+The implementation of the \code{getDemand()} method is straightforward.
+Compute $\rvD_u$
+by computing the sum of the values of the $\rvnu_{iu}$ variables
+and doing arithmetic.
+\begin{lstlisting}
+int getDemand(int t) {
+    double sum = 0;
+    for (int s = t - M + 1; s <= t; ++s) {
+        for (int k = 0; k < K; ++k) {
+            Key key = new Key(s, t, k);
+            sum += map.get(key);
+        }
+    }
+    return (int) Math.round(getDemandMean(t) * Math.exp(sum));
+}
+\end{lstlisting}
+
+
+
+
+
+\subsection{Vehicle Accessiblity Lead Time Model}
+
+The vehicle accessibility lead time model is implemented
+in the class \code{Vehicle\-Accessibility\-Single\-Facility\-Lead\-Time}.
+This lead time model assumes that
+when a district facility makes a shipment to a health facility
+(in the intermediate stocking configuration)
+or receives a shipment from the national facility for a health facility
+(in the cross-docking configuration),
+the district facility will deliver the shipment
+in its next visit to the health facility.
+The model assumes that
+there is a Bernoulli random variable representing the vehicle availability,
+and a second Bernoulli random variable representing
+the roads to the health facility being accessible by vehicles.
+A successful visit to a health facility
+occurs during a given period
+if and only if both of the Bernoulli random variables are successes.
+For each health facility,
+the vehicle availibility is given by the mean secondary lead time
+for health facilities in the district (see \code{replenishment.csv});
+while the health facility accessibility
+is specified in the input file \code{health-facilities-accessibility.csv}.
+
+To instantiate the class \code{VehicleAccessibilityLeadTime},
+we must specify the following parameters:
+\begin{itemize}
+\item The simulation horizon,
+i.e.\ generate visit booleans (true/false)
+between \code{startPeriod} and \code{endPeriod}
+\item \code{mean} The mean lead time if the destination facility
+had 100\% accessibility
+\item \code{accessibility}
+A \code{double} array,
+with \code{accessibility[k]} representing the probability that
+the destination facility is accessible in periods $t \equiv k \amodb 48$
+\item \code{random}
+An Apache Commons Math \code{RandomDataGenerator} object
+to generate random variables
+\end{itemize}
+
+The constructor of the class \code{VehicleAccessibilityLeadTime}
+creates a Bernoulli random variable for each period $t$
+between the \code{startPeriod} and \code{endPeriod},
+which indicates whether the vehicle
+makes a visit to the retail facility during period $t$.
+The probability that the Bernoulli random variable for period $t$ is a success
+is the product of the accessibility of the retail facility
+and the vehicle availibility probability.
+In the constructor,
+the following code sets hasVisit(t)
+equal to the boolean (true/false)
+depending on whether there is a successful visit to the health facility
+in the period $t$.
+\begin{lstlisting}
+hasVisit = new NegativeArray<>(startPeriod, endPeriod);
+for (int t = startPeriod; t < endPeriod; ++t) {
+    double r = random.nextUniform(0.0, 1.0);
+    double vp = visitProbability(t);
+    hasVisit.set(t, r < vp);
+}
+\end{lstlisting}
+To compute the next lead time for a shipment sent in period $t$,
+the code just needs to look for the next period $\geq t$
+which is a successful visit.
+If there is no visit within the simulation horizon,
+then indicate that the lead time does not exist.
+\begin{lstlisting}
+int getLeadTime(int period) throws NoSuchElementException {
+    for (int t = period; t < endPeriod; ++t) {
+        if (hasVisit.get(t)) {
+            return t - period;
+        }
+    }
+    String errorMessage = String.format(
+            "startPeriod = %d, endPeriod = %d, period = %d",
+            startPeriod, endPeriod, period);
+    throw new NoSuchElementException(errorMessage);
+}
+\end{lstlisting}

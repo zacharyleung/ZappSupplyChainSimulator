@@ -1,0 +1,72 @@
+\documentclass[margin=0pt]{standalone}
+
+\usepackage{amsmath}
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=1.14,width=80mm,height=60mm}
+
+    \pgfplotsset{
+        % create filter that discards all entries from the table row
+        % given as first argument of this style with the value not equal
+        % to the second argument of this style
+        discard if not/.style 2 args={
+            x filter/.append code={
+                \edef\tempa{\thisrow{#1}}
+                \edef\tempb{#2}
+                \ifx\tempa\tempb
+                \else
+                    \def\pgfmathresult{NaN}
+                \fi
+            },
+        },
+    }
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis}[
+        align=center,legend pos=south west,
+        %title={(b) $\frac{4\times LSI\times AMI-I}{PROP} \{\text{delay} = 0\}$},
+        xlabel=Facility Mean Lead Time (Weeks),
+        ylabel=Facility Service Level,
+        colorbar,
+        colorbar style={ylabel=Weekly Demand CV},
+        only marks,
+        scatter,
+        point meta=explicit,
+        % choose an appropriate `cycle list name' that has different marks
+        cycle list name=mark list,
+        % so it looks better in the legend I set the default fill color to gray
+        mark list fill=gray,
+        % I don't like the default `colormap', so I have changed it
+        colormap name=viridis,
+        % to not overlap some points I have moved the legend outside of the plot
+        legend columns=-1,legend pos=south west,
+        legend cell align=left,
+        % Add horizontal space between legend entries
+        legend style={/tikz/every even column/.append style={column sep=4mm}},
+        ymin=0.2,ymax=1,
+        xtick={2,4,...,18},
+        ytick={0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1},
+    ]
+
+        % added a "dummy" legend entry to create a common header
+        \addlegendimage{empty legend}
+        \addlegendentry{Delivery Groups:}
+
+        % cycle through all different shape numbers
+        \pgfplotsforeachungrouped \i in {1,2,3} {
+            \addplot+ table [
+                x=total_lead_time_mean,
+                y=service_level_mean,
+                meta=weekly_demand_cv,
+                col sep=comma,
+                % use the above defined style here
+                discard if not={delivery_group}{\i},
+            ] {0150/LsiAmdIPropPolicyFactoryDelay0.csv};
+                % add a legend entry that contains the shape number
+                \addlegendentryexpanded{\ \i};
+        }
+
+    \end{axis}
+\end{tikzpicture}
+\end{document}

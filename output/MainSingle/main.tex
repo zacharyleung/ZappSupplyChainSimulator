@@ -1,0 +1,31 @@
+\documentclass[margin=2pt]{standalone}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+\pgfplotsset{compat=1.9}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \begin{axis}[
+      ybar,
+      ylabel=Inventory,
+      height=4cm,
+      width=\textwidth,
+      ymin=0,
+      legend style={at={(0.5,-0.33)},anchor=north},
+      legend columns=2]
+    \pgfplotstableread{java/xdock-past.dat}\loadedtable
+    \addplot[sharp plot,line legend,black,very thick] 
+        table [x = Period, y = InvBegin]
+        {\loadedtable};
+    \addplot[bar width=4pt,draw=purple,fill=purple]
+        table [x = Period, y = ShipmentSent]
+        {\loadedtable};
+    \legend{Inventory, Shipments};
+  \end{axis}
+\end{tikzpicture}
+
+\end{document}
+

@@ -1,0 +1,67 @@
+\begin{tikzpicture}
+  \begin{axis}[
+      cycle list name=mystyle,
+      title={(b) System Service Level (SDR = 1.1)},
+      xlabel style={align=center},
+      xlabel=Lead Time and Demand Seasonality\\Parameter ($\phi$),
+      ylabel=System Service Level,
+      xmin=0,xmax=1,ymin=0.5,ymax=1]
+
+    % Current
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/AmiIpPropPolicyFactoryDelay0.csv};
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/AmiIpPropPolicyFactoryDelay1.csv};
+
+    % Last year
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/AmdLastYearIpPropPolicyFactoryDelay0.csv};
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/AmdLastYearIpPropPolicyFactoryDelay1.csv};
+    
+    % LSI
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/LsiAmdIPropPolicyFactoryDelay0.csv};
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/LsiAmdIPropPolicyFactoryDelay1.csv};
+    
+    % Optimization
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/OptimizationPolicyDelay0.csv};
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0010/OptimizationPolicyDelay1.csv};
+
+  \end{axis}
+\end{tikzpicture}

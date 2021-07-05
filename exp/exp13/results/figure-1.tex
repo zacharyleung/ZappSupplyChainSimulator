@@ -1,0 +1,87 @@
+\begin{tikzpicture}
+  \begin{axis}[
+      cycle list name=mystyle,
+      title={(a) System Service Level (SDR = 0.8)},
+      xlabel style={align=center},
+      xlabel=Lead Time and Demand Seasonality\\Parameter ($\phi$),
+      ylabel=System Service Level,
+      legend to name={the legend reference},
+      legend cell align={left},
+      legend style={row sep=3mm},
+      legend columns=2,transpose legend,
+      xmin=0,xmax=1,ymin=0.5,ymax=1]
+      
+    % Current
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/AmiIpPropPolicyFactoryDelay0.csv};
+    \addlegendentry{$\frac{4 \times AMI - IP}{PROP}
+    \{\text{delay} = 0\}$}
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/AmiIpPropPolicyFactoryDelay1.csv};
+    \addlegendentry{$\frac{4 \times AMI - IP}{PROP}
+    \{\text{delay} = 1\}$}
+
+    % Last year
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/AmdLastYearIpPropPolicyFactoryDelay0.csv};
+    \addlegendentry{$\frac{4\times AMD[-12,-9] - IP}{PROP}
+    \{\text{delay} = 0\}$}
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/AmdLastYearIpPropPolicyFactoryDelay1.csv};
+    \addlegendentry{$\frac{4\times AMD[-12,-9] - IP}{PROP}
+    \{\text{delay} = 1\}$}
+    
+    % LSI
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/LsiAmdIPropPolicyFactoryDelay0.csv};
+    \addlegendentry{$\frac{4 \times LSI \times AMD - I}{PROP}
+    \{\text{delay} = 0\}$}
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/LsiAmdIPropPolicyFactoryDelay1.csv};
+    \addlegendentry{$\frac{4 \times LSI \times AMD - I}{PROP}
+    \{\text{delay} = 1\}$}
+    
+    % Optimization
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/OptimizationPolicyDelay0.csv};
+    \addlegendentry{$OPT^{16}_{0.89}
+    \{\text{delay} = 0\}$}
+    \addplot
+        table[x=PhiParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {0.8/0010/OptimizationPolicyDelay1.csv};
+    \addlegendentry{$OPT^{16}_{0.99}
+    \{\text{delay} = 1\}$}
+
+  \end{axis}
+\end{tikzpicture}

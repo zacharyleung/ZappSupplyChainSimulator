@@ -1,0 +1,276 @@
+\documentclass[12pt]{article}
+
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{verbatim}
+\usepackage[margin=1in,paperheight=11in,paperwidth=11in]{geometry}
+\usepackage{xcolor}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{groupplots}
+
+\pgfplotscreateplotcyclelist{mystyle}{
+thick,black\\%
+thick,black,dashed\\%
+thick,blue\\%
+thick,blue,dashed\\%
+thick,green!80!black\\%
+thick,green!80!black,dashed\\%
+thick,red\\%
+thick,red,dashed\\%
+}
+
+
+
+\title{Exp08}
+\author{Zachary Leung}
+\date{2017-07-22}
+
+\begin{document}
+
+% Suppress page numbers
+\pagenumbering{gobble}
+
+\maketitle
+
+%\begin{center}
+%\begin{tabular}{lrr}
+%\toprule
+%  & Replications & Max RMOE \\
+%\midrule
+%Exp08 (sdr = 0.8) & 25 & 6.4\% \\
+%Exp08 (sdr = 1.0) & 50 & 7.7\% \\
+%Exp08 (sdr = 1.2) & 60 & 12.3\% \\
+%\bottomrule
+%\end{tabular}
+%\end{center}
+
+\begin{verbatim}
+Supply/Demand = 0.8
+number of replications = 435
+max RMOE               = 0.012541
+max serv level AMOE    = 0.002419
+max sd serv level AMOE = 0.002901
+max inv level AMOE     = 0.205729
+
+Supply/Demand = 1.0
+number of replications = 215
+max RMOE               = 0.050429
+max serv level AMOE    = 0.002038
+max sd serv level AMOE = 0.002151
+max inv level AMOE     = 0.168707
+
+Supply/Demand = 1.2
+number of replications = 250
+max RMOE               = 0.054233
+max serv level AMOE    = 0.001828
+max sd serv level AMOE = 0.002183
+max inv level AMOE     = 0.157654
+\end{verbatim}
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={
+                      group size=3 by 2,
+                      vertical sep=80pt,
+                      horizontal sep=50pt,
+                      %x descriptions at=edge bottom,
+                      %y descriptions at=edge left
+                  },
+                  cycle list name=mystyle,
+                  % If we want to have x-labels on each plot, then
+                  % uncomment the line below
+                  xlabel=Facility Inventory (No.\ of Weeks),
+                  width=7cm,height=8cm,
+                  xmin=0,xmax=15,ymin=0]
+%
+% Plot (1, 1)
+%
+    \nextgroupplot[
+        title={(a) Supply/Demand = 0.8},
+        ylabel=System Service Level,
+        ymax=1,
+        legend cell align={left},
+        legend to name=exp08legend,
+        legend style={row sep=3mm,at={(0.5,1.03)},anchor=south}]
+      
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/amd-ip-delay0-pro.csv};
+    \addlegendentry{$\frac{M \times AMD[-3,0] - IP}{PROP}$ \{delay = 0\}}
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/ami-i-delay1-fcfs.csv};
+    \addlegendentry{$\frac{M \times AMI[-3,0] - I}{FCFS}$ \{delay = 1\}}
+    
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/lsi-d-ip-delay0-pro.csv};
+    \addlegendentry{$\frac{M \times LSI \times AMD[-3,0] - IP}{PROP}$ \{delay = 0\}}
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/lsi-c-i-delay1-fcfs.csv};
+    \addlegendentry{$\frac{M \times LSI \times AMI[-3,0] - I}{FCFS}$ \{delay = 1\}}
+    
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/lastyear-d-ip-0-pro.csv};
+    \addlegendentry{$\frac{M \times AMD[-12,-9] - IP}{PROP}$ \{delay = 0\}}
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/lastyear-c-i-1-fcfs.csv};
+    \addlegendentry{$\frac{M \times AMI[-12,-9] - I}{FCFS}$ \{delay = 1\}}
+    
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/opt-fa-099-0-good.csv};
+    \addlegendentry{$OPT_{0.99}^C$ \{delay = 0, forecast = standard\}}
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {0.8/7years-435reps/opt-fa-099-1-bad.csv};
+    \addlegendentry{$OPT_{0.99}^C$ \{delay = 1, forecast = poor\}}
+%
+% Plot (1, 2)
+%
+    \nextgroupplot[
+        title={(b) Supply/Demand = 1.0},
+        ylabel=System Service Level,
+        ymax=1]
+      
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/amd-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/ami-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/lsi-d-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/lsi-c-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/lastyear-d-ip-0-pro.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/lastyear-c-i-1-fcfs.csv};
+
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/opt-fa-099-0-good.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.0/7years-215reps/opt-fa-099-1-bad.csv};
+%
+% Plot (1, 3)
+%
+    \nextgroupplot[
+        title={(c) Supply/Demand = 1.2},
+        ylabel=System Service Level,
+        ymax=1]
+      
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/amd-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/ami-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/lsi-d-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/lsi-c-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/lastyear-d-ip-0-pro.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/lastyear-c-i-1-fcfs.csv};
+
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/opt-fa-099-0-good.csv};
+    \addplot table [x=inv_mean,y=serv_mean,col sep=comma]
+        {1.2/7years-250reps/opt-fa-099-1-bad.csv};
+%
+% Plot (2,1)
+%
+    \nextgroupplot[
+        title={(d) Supply/Demand = 0.8},
+        ylabel=Std.~Dev.~of Facility Service Level,
+        ymax=0.39]
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/amd-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/ami-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/lsi-d-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/lsi-c-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/lastyear-d-ip-0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/lastyear-c-i-1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/opt-fa-099-0-good.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {0.8/7years-435reps/opt-fa-099-1-bad.csv};
+    \coordinate (c1) at (rel axis cs:0,0);
+%
+% Plot (2,2)
+%
+    \nextgroupplot[
+        title={(e) Supply/Demand = 1.0},
+        ylabel=Std.~Dev.~of Facility Service Level,
+        xlabel=Facility Inventory (No.\ of Weeks),
+        ymax=0.39]
+
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/amd-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/ami-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/lsi-d-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/lsi-c-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/lastyear-d-ip-0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/lastyear-c-i-1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/opt-fa-099-0-good.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.0/7years-215reps/opt-fa-099-1-bad.csv};
+
+%
+% Plot (2,3)
+%
+    \nextgroupplot[
+        title={(f) Supply/Demand = 1.2},
+        ylabel=Std.~Dev.~of Facility Service Level,
+        ymax=0.39]
+
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/amd-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/ami-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/lsi-d-ip-delay0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/lsi-c-i-delay1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/lastyear-d-ip-0-pro.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/lastyear-c-i-1-fcfs.csv};
+    
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/opt-fa-099-0-good.csv};
+    \addplot table [x=inv_mean,y=sdsl_mean,col sep=comma]
+        {1.2/7years-250reps/opt-fa-099-1-bad.csv};
+    \coordinate (c2) at (rel axis cs:1,0);
+    
+\end{groupplot}
+    \coordinate (c3) at ($(c1)!.5!(c2)$);
+    \node[below] at (c3 |- current bounding box.south)
+        {\pgfplotslegendfromname{exp08legend}};
+
+\end{tikzpicture}
+\end{figure}
+
+
+\end{document}
+

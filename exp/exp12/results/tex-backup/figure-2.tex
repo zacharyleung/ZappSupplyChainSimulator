@@ -1,0 +1,42 @@
+\begin{tikzpicture}
+  \begin{axis}[
+      cycle list name=mystyle,
+      title={(b) System Service Level (SDR = 1.1)},
+      xlabel=Facility Accessibility Parameter ($\phi_L$),
+      ylabel=System Service Level,
+      xmin=0,xmax=1,ymin=0.5,ymax=1]
+
+    % Current
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0025/AmiIpPropPolicyFactoryDelay0.csv};
+
+    % Last year
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0025/AmdLastYearIpPropPolicyFactoryDelay0.csv};
+    
+    % LSI
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0025/LsiAmdIPropPolicyFactoryDelay0.csv};
+    
+    % Optimization    
+    \addplot
+        table[x=AccessParameter,
+              col sep=comma,
+              y=serv_mean,
+              y error=serv_meane]
+        {1.1/0025/OptimizationPolicyDelay0.csv};
+
+  \end{axis}
+\end{tikzpicture}

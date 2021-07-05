@@ -1,0 +1,143 @@
+% Performance graphs: opt T = 48, P = 20
+\begin{figure}[h!]
+
+  \pgfplotsset{
+    cycle list={%
+      {red,mark=*},
+      {blue,mark=*},
+      {green,mark=diamond},
+      {black,mark=diamond},
+    }
+  }
+
+  \begin{center}
+  \begin{tabular}{MM}
+    \begin{tikzpicture}
+      \begin{axis}[
+          title={(a)},
+          width=0.45\textwidth,
+          xlabel=Supply/Demand Ratio,
+          ylabel=System Service Level,
+          ymin=0.5,ymax=1,
+          legend columns=1,
+          legend entries={$IM_3^2[1,ami]$\\
+              $XM^4[1,ami]$\\
+              $XO_{0.99}^{48}[0,ind]$\\
+              $CL^{48}$\\},
+          legend to name=legend:performance:existing]
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/istock.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/xdock-past.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/opt-forecast-good-delay-0.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=ServiceLevel,
+                  y error=ServiceLevele]
+            {R/clair.csv};
+      \end{axis}
+    \end{tikzpicture}
+  &
+    \begin{tikzpicture}
+      \begin{axis}[
+          title={(b)},
+          width=0.45\textwidth,
+          xlabel=Supply/Demand Ratio,
+          ylabel=HC Inv (No.\ of Weeks)]
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=MeanInventoryLevel,
+                  y error=MeanInventoryLevele]
+            {R/istock.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=MeanInventoryLevel,
+                  y error=MeanInventoryLevele]
+            {R/xdock-past.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=MeanInventoryLevel,
+                  y error=MeanInventoryLevele]
+            {R/opt-forecast-good-delay-0.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=MeanInventoryLevel,
+                  y error=MeanInventoryLevele]
+            {R/clair.csv};
+      \end{axis}
+    \end{tikzpicture}
+  \\
+    \begin{tikzpicture}
+      \begin{axis}[
+          title={(c)},
+          width=0.45\textwidth,
+          xlabel=Supply/Demand Ratio,
+          ylabel=Std Dev of HC Service Level,
+          ytick={0,0.05,0.10,0.15},
+          yticklabels={0,0.05,0.10,0.15},]
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=StdDevOfServiceLevel,
+                  y error=StdDevOfServiceLevele]
+            {R/istock.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=StdDevOfServiceLevel,
+                  y error=StdDevOfServiceLevele]
+            {R/xdock-past.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=StdDevOfServiceLevel,
+                  y error=StdDevOfServiceLevele]
+            {R/opt-forecast-good-delay-0.csv};
+        \addplot+[error bars/.cd,
+            y dir=both,y explicit]
+            table[x=SupplyDemandRatio,
+                  col sep=comma,
+                  y=StdDevOfServiceLevel,
+                  y error=StdDevOfServiceLevele]
+            {R/clair.csv};
+      \end{axis}
+    \end{tikzpicture}
+  &
+    \ref{legend:performance:existing}
+  \end{tabular}
+  \end{center}
+  \caption{
+    Simulated performance measures of inventory policies.
+  }
+  \label{figure:performance:existing}
+\end{figure}
+
